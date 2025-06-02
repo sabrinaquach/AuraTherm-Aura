@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient} from 'expo-linear-gradient';
 
-<<<<<<< HEAD
 const Splash = ({ navigation }) => {
   useEffect (() => {
     const timer = setTimeout (() => {

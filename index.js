@@ -1,8 +1,24 @@
 import { registerRootComponent } from 'expo';
-
 import App from './App';
+import { StatusBar } from 'expo-status-bar';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { LinearGradient} from 'expo-linear-gradient';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-// registerRootComponent calls AppRegistry.registerComponent('main', () => App);
-// It also ensures that whether you load the app in Expo Go or in a native build,
-// the environment is set up appropriately
+import Splash from './aura/screens/splash.js';
+import Onboarding from './aura/screens/onboarding.js';
+
+const Stack = createNativeStackNavigator();
+
+export default function App() {
+  <NavigationContainer>
+    <StatusBar style = "auto"/>
+    <Stack.Navigator>
+      <Stack.Screen name = "Splash" component = {Splash}/>
+      <Stack.Screen name = "Onboarding" component = {Onboarding}/>
+    </Stack.Navigator>
+  </NavigationContainer>
+}
 registerRootComponent(App);
