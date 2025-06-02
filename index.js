@@ -1,5 +1,4 @@
 import { registerRootComponent } from 'expo';
-import App from './App';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -12,13 +11,15 @@ import Onboarding from './aura/screens/onboarding.js';
 
 const Stack = createNativeStackNavigator();
 
-export default function App() {
-  <NavigationContainer>
-    <StatusBar style = "auto"/>
-    <Stack.Navigator>
-      <Stack.Screen name = "Splash" component = {Splash}/>
-      <Stack.Screen name = "Onboarding" component = {Onboarding}/>
-    </Stack.Navigator>
-  </NavigationContainer>
+function App() {
+    return (
+        <NavigationContainer>
+            <StatusBar style = "auto"/>
+            <Stack.Navigator>
+                <Stack.Screen name="Splash" component={Splash}/>
+                <Stack.Screen name="Onboarding" component={Onboarding}/>
+            </Stack.Navigator>
+        </NavigationContainer>
+    );
 }
 registerRootComponent(App);

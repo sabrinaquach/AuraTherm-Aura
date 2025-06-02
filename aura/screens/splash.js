@@ -5,7 +5,7 @@ import { LinearGradient} from 'expo-linear-gradient';
 const Splash = ({ navigation }) => {
   useEffect (() => {
     const timer = setTimeout (() => {
-        navigation.replace('onboarding');
+        navigation.replace('Onboarding');
     }, 2000);
     
     return () => clearTimeout(timer);
