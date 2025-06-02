@@ -1,7 +1,7 @@
 import React from 'react';
 import {View, Text, Image, ScrollView, TextInput} from 'react-native';
 
-const onboarding = () => {
+const Onboarding = () => {
     return (
         <ScrollView>
             <Text>Welcome to Aura</Text>

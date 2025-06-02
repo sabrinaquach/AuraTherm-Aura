@@ -2,7 +2,8 @@ import React, { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient} from 'expo-linear-gradient';
 
-const splash = ({ navigation }) => {
+<<<<<<< HEAD
+const Splash = ({ navigation }) => {
   useEffect (() => {
     const timer = setTimeout (() => {
         navigation.replace('onboarding');
@@ -17,6 +18,8 @@ const splash = ({ navigation }) => {
     </View>
   );
 };
+
+export default Splash;
 
 const styles = StyleSheet.create({
   container: {
