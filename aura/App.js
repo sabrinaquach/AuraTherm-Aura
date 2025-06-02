@@ -5,26 +5,17 @@ import { LinearGradient} from 'expo-linear-gradient';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
+import Splash from '/Users/sabrina/AuraTherm-Aura/aura/screens/splash';
 import Onboarding from '/Users/sabrina/AuraTherm-Aura/aura/screens/onboarding';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Aura</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+const Stack = createNativeStackNavigator();
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 60,
-    fontWeight: 'bold',
-  }
-});
+export default function App() {
+  <NavigationContainer>
+    <StatusBar style = "auto"/>
+    <Stack.Navigator>
+      <Stack.Screen name = "splash" component = {splash}/>
+      <Stack.Screen name = "onboarding" component = {onboarding}/>
+    </Stack.Navigator>
+  </NavigationContainer>
+}
