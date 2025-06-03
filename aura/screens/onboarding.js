@@ -1,9 +1,14 @@
 import React, {useState} from 'react';
 import {View, Text, Image, ScrollView, TextInput, Button, StyleSheet} from 'react-native';
 import Onboarding from 'react-native-onboarding-swiper';
+import { RadioButton } from 'react-native-paper';
 
 const OnboardingScreen = ({ navigation }) => {
     const [text, setText] = useState('');
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [selectedValue, setselectedValue] = useState('agree');
 
     return (
         <Onboarding
@@ -43,6 +48,17 @@ const OnboardingScreen = ({ navigation }) => {
                                 defaultValue={text}
                                 // onChangeText={setUsername}
                             />
+                            <View style={styles.radioGroup}>
+                                <View style={styles.radioButton}>
+                                    <RadioButton
+                                        value="agree"
+                                        status={selectedValue === 'agree' ? 'checked' : 'unchecked'}
+                                        onPress={() => setselectedValue('agree')}
+                                        color="green"
+                                    />
+                                    <Text style={styles.radioLabel}>I accept the terms and privacy policy.</Text>
+                                </View>
+                            </View>
                         </View>
                     )
                     
@@ -59,7 +75,8 @@ const styles = StyleSheet.create ({
         flexShrink: 0,
         width: 402,
         height: 874,
-        alignItems: 'center',
+        alignItems: 'left',
+        paddingLeft: 25,
     },
     subtitle: {
         fontSize: 18,
@@ -67,6 +84,8 @@ const styles = StyleSheet.create ({
         textAlign: 'left',
         paddingTop: 20,
         paddingBottom: 8,
+        justifyContent: 'left',
+        alignItems: 'left',
     },
     input: {
         color: 'black',
@@ -75,5 +94,20 @@ const styles = StyleSheet.create ({
         borderWidth: 1,
         borderRadius: 10,
         borderColor: '#D9D9D9',
+        padding: 10,
     },
+    radioGroup: {
+        flexDirection: 'row', 
+        alignItems: 'left', 
+        marginTop: 20, 
+      },
+      radioButton: {
+        flexDirection: 'row', 
+        alignItems: 'center', 
+      },
+      radioLabel: {
+        marginLeft: 8, 
+        fontSize: 16,
+        color: '#333',
+      },
 });
