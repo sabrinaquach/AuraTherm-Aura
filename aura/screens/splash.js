@@ -22,10 +22,19 @@ export default Splash;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
+    // flex: 1,
+    // backgroundColor: '#fff',
+    // alignItems: 'center',
+    // justifyContent: 'center',
+    display: 'flex',
+    width: 402,
+    height: 874,
+    paddingTop: 375,
+    paddingRight:38,
+    paddingBottom: 423,
+    paddingLeft: 37,
+    flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
   },
   title: {
     fontSize: 60,

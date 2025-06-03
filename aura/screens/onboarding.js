@@ -1,9 +1,9 @@
-import React from 'react';
-import {View, Text, Image, ScrollView, TextInput, Button} from 'react-native';
+import React, {useState} from 'react';
+import {View, Text, Image, ScrollView, TextInput, Button, StyleSheet} from 'react-native';
 import Onboarding from 'react-native-onboarding-swiper';
 
 const OnboardingScreen = ({ navigation }) => {
-    // const [name, setName] = useState('');
+    const [text, setText] = useState('');
 
     return (
         <Onboarding
@@ -21,44 +21,26 @@ const OnboardingScreen = ({ navigation }) => {
                     title: 'Create An Account',
                     // image: <Image source={require('./Images/Screenshot 2025-06-02 at 3.01.38 PM.png')} />,
                     subtitle: (
-                        <View>
+                        <View style={styles.container}>
                             <Text style={styles.subtitle}>Username</Text>
                             <TextInput
-                                style={{
-                                    width: 350,
-                                    height: 50,
-                                    borderWidth: 1,
-                                    borderRadius: 10,
-                                    borderColor: '#D9D9D9',
-                                }}
+                                style={styles.input}
                                 placeholder='johnsmith'
-                                defaultValue='johnsmith'
+                                defaultValue={text}
                                 // onChangeText={setUsername}
                             />
                             <Text style={styles.subtitle}>Email</Text>
                             <TextInput
-                                style={{
-                                    width: 350,
-                                    height: 50,
-                                    borderWidth: 1,
-                                    borderRadius: 10,
-                                    borderColor: '#D9D9D9',
-                                }}
+                                style={styles.input}
                                 placeholder='johnsmith@gmail.com'
-                                defaultValue='johnsmith@gmail.com'
+                                defaultValue={text}
                                 // onChangeText={setUsername}
                             />
                             <Text style={styles.subtitle}>Password</Text>
                             <TextInput
-                                style={{
-                                    width: 350,
-                                    height: 50,
-                                    borderWidth: 1,
-                                    borderRadius: 10,
-                                    borderColor: '#D9D9D9',
-                                }}
+                                style={styles.input}
                                 placeholder='*****'
-                                defaultValue='*****'
+                                defaultValue={text}
                                 // onChangeText={setUsername}
                             />
                         </View>
@@ -71,3 +53,27 @@ const OnboardingScreen = ({ navigation }) => {
 };
 
 export default OnboardingScreen;
+
+const styles = StyleSheet.create ({
+    container: {
+        flexShrink: 0,
+        width: 402,
+        height: 874,
+        alignItems: 'center',
+    },
+    subtitle: {
+        fontSize: 18,
+        fontWeight: 'medium',
+        textAlign: 'left',
+        paddingTop: 20,
+        paddingBottom: 8,
+    },
+    input: {
+        color: 'black',
+        width: 350,
+        height: 50,
+        borderWidth: 1,
+        borderRadius: 10,
+        borderColor: '#D9D9D9',
+    },
+});
