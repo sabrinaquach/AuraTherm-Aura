@@ -8,7 +8,7 @@ const OnboardingScreen = ({ navigation }) => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [selectedValue, setselectedValue] = useState('agree');
+    const [isSelected, setIsSelected] = useState(false);
 
     return (
         <Onboarding
@@ -51,9 +51,9 @@ const OnboardingScreen = ({ navigation }) => {
                             <View style={styles.radioGroup}>
                                 <View style={styles.radioButton}>
                                     <RadioButton
-                                        value="agree"
-                                        status={selectedValue === 'agree' ? 'checked' : 'unchecked'}
-                                        onPress={() => setselectedValue('agree')}
+                                        value={isSelected}
+                                        status={isSelected ? 'checked' : 'unchecked'}
+                                        onPress={() => setIsSelected(!isSelected)}
                                         color="green"
                                     />
                                     <Text style={styles.radioLabel}>I accept the terms and privacy policy.</Text>
