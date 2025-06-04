@@ -8,16 +8,18 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import Splash from './aura/screens/splash.js';
 import Onboarding from './aura/screens/onboarding.js';
+import TermsAndConditions from './aura/screens/terms.js';
 
 const Stack = createNativeStackNavigator();
 
 function App() {
     return (
         <NavigationContainer>
-            <StatusBar style = "auto"/>
+            {/* <StatusBar style = "auto"/> */}
             <Stack.Navigator>
-                <Stack.Screen name="Splash" component={Splash}/>
-                <Stack.Screen name="Onboarding" component={Onboarding}/>
+                <Stack.Screen name="Splash" component={Splash} options={{ headerShown: false }}/>
+                <Stack.Screen name="Onboarding" component={Onboarding} options={{ headerShown: false }}/>
+                <Stack.Screen name="Terms" component={TermsAndConditions} options={{ headerShown: false }}/>
             </Stack.Navigator>
         </NavigationContainer>
     );
