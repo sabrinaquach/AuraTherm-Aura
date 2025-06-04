@@ -15,8 +15,8 @@ const OnboardingScreen = ({ navigation }) => {
     return (
         <SafeAreaView style={styles.safeArea}>
             <Onboarding
-                onSkip={() => navigation.replace('Home')}
-                onDone={() => navigation.replace('Home')}
+                // onSkip={() => navigation.replace('Home')}
+                // onDone={() => navigation.replace('Home')}
                 pages={[
                     {
                         backgroundColor: '#fff',
@@ -62,7 +62,14 @@ const OnboardingScreen = ({ navigation }) => {
                                         />
                                         <View style={styles.learnContainer}>
                                             <Text style={styles.radioLabel}>I accept the terms and privacy policy.</Text>
-                                            <TouchableOpacity onPress={() => navigation.navigate('Terms')}>
+                                            <TouchableOpacity 
+                                                onPress={() => navigation.navigate('Terms', 
+                                                {
+                                                    onAgree: () => setIsSelected(true),
+                                                    onReject: () => setIsSelected(false),
+                                                }
+                                                )}
+                                            >
                                                 <Text style={styles.linkText}>Learn More</Text>
                                             </TouchableOpacity>
                                         </View>
@@ -129,6 +136,6 @@ const styles = StyleSheet.create ({
     linkText: {
         marginLeft: 8, 
         fontSize: 16,
-        color: '#333',
+        color: '#757575',
     },
 });
