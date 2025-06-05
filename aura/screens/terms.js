@@ -76,11 +76,11 @@ const TermsAndConditions = ({ navigation, route }) => {
                 </View>
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity style={styles.agreeButton} onPress={acceptedTerm}>
-                        <Text>I agree to the Terms and Conditions</Text>
+                        <Text style={styles.buttonAgreeText}>I agree to the Terms and Conditions</Text>
                     </TouchableOpacity>
                 </View>
                     <TouchableOpacity style={styles.rejectButton} onPress={rejectedTerm}>
-                        <Text>I do not agree</Text>
+                        <Text style={styles.buttonRejectText}>I do not agree</Text>
                     </TouchableOpacity>
             </ScrollView>
         </SafeAreaView>
@@ -98,9 +98,8 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     title: {
-        fontSize: 20,
+        fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 10,
     },
     subtitle: {
         fontSize: 16,
@@ -119,6 +118,8 @@ const styles = StyleSheet.create({
         padding: 15,
         borderRadius: 10,
         backgroundColor: '#A3C858C9',
+        width: '100%',
+        height: 50,
     },
     rejectButton: {
         borderWidth: 0.2,
@@ -126,6 +127,17 @@ const styles = StyleSheet.create({
         padding: 15,
         borderRadius: 10,
         backgroundColor: '#E3EFCD',
+        width: '100%',
+        height: 50,
+    },
+    buttonAgreeText: {
+        color: '#000',
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    buttonRejectText: {
+        color: '#000',
+        fontSize: 16,
     },
     buttonContainer: {
         paddingBottom: 10,

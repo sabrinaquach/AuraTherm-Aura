@@ -10,6 +10,7 @@ import Splash from './aura/screens/splash.js';
 import Welcome from './aura/screens/welcome.js';
 import Account from './aura/screens/registerAccount.js';
 import Preferences from './aura/screens/homePreferences.js';
+import NetworkPairing from './aura/screens/networkPairing.js';
 import Onboarding from './aura/screens/onboarding.js';
 import TermsAndConditions from './aura/screens/terms.js';
 
@@ -24,6 +25,7 @@ function App() {
                 <Stack.Screen name="Welcome" component={Welcome} options={{ headerShown: false }}/>
                 <Stack.Screen name="Account" component={Account} options={{ headerShown: false }}/>
                 <Stack.Screen name="Preferences" component={Preferences} options={{ headerShown: false }}/>
+                <Stack.Screen name="NetworkPairing" component={NetworkPairing} options={{ headerShown: false }}/>
                 <Stack.Screen name="Onboarding" component={Onboarding} options={{ headerShown: false }}/>
                 <Stack.Screen name="Terms" component={TermsAndConditions} options={{ headerShown: false }}/>
             </Stack.Navigator>

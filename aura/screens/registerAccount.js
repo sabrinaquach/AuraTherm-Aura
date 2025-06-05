@@ -8,6 +8,18 @@ const Account = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isSelected, setIsSelected] = useState(false);
+    
+    // const [errors, setErrors] = useState('');
+    // const validate = () => {
+    //     Keyboard.dismiss();
+    //     if(!InputAccessoryView.email) {
+    //         handleError('Please input email', 'email');
+    //     }
+    // };
+    // const handleOnChange = (text, input) => {
+    //     setInputs(prevState => ({...prevState, [input]: text}));
+    // };
+
 
     return (
         <View style={styles.container}>
@@ -18,7 +30,7 @@ const Account = ({ navigation }) => {
                 placeholder='johnsmith'
                 placeholderTextColor='gray'
                 defaultValue={text}
-                // onChangeText={setUsername}
+                // onChangeText={text => handleOnChange(text, 'username')}
             />
             <Text style={styles.subtitle}>Email</Text>
             <TextInput
@@ -26,7 +38,8 @@ const Account = ({ navigation }) => {
                 placeholder='johnsmith@gmail.com'
                 placeholderTextColor='gray'
                 defaultValue={text}
-                // onChangeText={setUsername}
+                // error={errors.email}
+                // onChangeText={text => handleOnChange(text, 'email')}
             />
             <Text style={styles.subtitle}>Password</Text>
             <TextInput
@@ -35,7 +48,7 @@ const Account = ({ navigation }) => {
                 placeholderTextColor='gray'
                 defaultValue={text}
                 secureTextEntry
-                // onChangeText={setUsername}
+                // onChangeText={text => handleOnChange(text, 'password')}
             />
             <View style={styles.radioGroup}>
                 <View style={styles.radioButton}>
@@ -89,7 +102,6 @@ const styles = StyleSheet.create ({
         borderRadius: 10,
         borderColor: '#D9D9D9',
         padding: 10,
-        // placeholderTextColor: 'gray',
     },
     title: {
         fontSize: 28,
@@ -130,14 +142,14 @@ const styles = StyleSheet.create ({
     },
     button: {
         backgroundColor: '#A3C858C9',
-        width: 350,
+        width: '100%',
         height: 50,
         borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
-        // marginTop: 20,
         position: 'absolute',
         bottom: 50,
+        borderWidth: 0.2,
       },
       buttonText: {
         color: '#000',
