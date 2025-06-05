@@ -11,10 +11,12 @@ const Account = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
+            <Text style={styles.title}>Create An Account</Text>
             <Text style={styles.subtitle}>Username</Text>
             <TextInput
                 style={styles.input}
                 placeholder='johnsmith'
+                placeholderTextColor='gray'
                 defaultValue={text}
                 // onChangeText={setUsername}
             />
@@ -22,13 +24,15 @@ const Account = ({ navigation }) => {
             <TextInput
                 style={styles.input}
                 placeholder='johnsmith@gmail.com'
+                placeholderTextColor='gray'
                 defaultValue={text}
                 // onChangeText={setUsername}
             />
             <Text style={styles.subtitle}>Password</Text>
             <TextInput
                 style={styles.input}
-                placeholder='*****'
+                placeholder='Password must be at least 8 characters'
+                placeholderTextColor='gray'
                 defaultValue={text}
                 secureTextEntry
                 // onChangeText={setUsername}
@@ -57,20 +61,45 @@ const Account = ({ navigation }) => {
                 </View>
                 </View>
             </View>
+            <View style={styles.buttonContainer}>
+            <TouchableOpacity 
+                style={styles.button}
+                onPress={() => navigation.navigate('Preferences')}
+            >
+                <Text style={styles.buttonText}>Start Setting My Preferences</Text>
+            </TouchableOpacity>
+            </View>
         </View>
     )
 }
 export default Account;
 
 const styles = StyleSheet.create ({ 
+    container: {
+        flex: 1,
+        paddingTop: 100,
+        paddingHorizontal: 20, 
+        backgroundColor: '#fff',
+    },
     input: {
         color: 'black',
-        width: 350,
-        height: 50,
+        width: '100%',
+        height: 45,
         borderWidth: 1,
         borderRadius: 10,
         borderColor: '#D9D9D9',
         padding: 10,
+        // placeholderTextColor: 'gray',
+    },
+    title: {
+        fontSize: 28,
+        fontWeight: 'bold',
+    },
+    subtitle: {
+        fontSize: 18,
+        fontWeight: '500',
+        paddingBottom: 5,
+        paddingTop: 20,
     },
     radioGroup: {
         flexDirection: 'row', 
@@ -94,4 +123,25 @@ const styles = StyleSheet.create ({
         fontSize: 16,
         color: '#757575',
     },
+    buttonContainer: {
+        flex: 1,
+        justifyContent: 'center',  
+        alignItems: 'center',   
+    },
+    button: {
+        backgroundColor: '#A3C858C9',
+        width: 350,
+        height: 50,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        // marginTop: 20,
+        position: 'absolute',
+        bottom: 50,
+      },
+      buttonText: {
+        color: '#000',
+        fontSize: 16,
+        fontWeight: '600',
+      },
 });
