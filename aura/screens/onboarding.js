@@ -26,7 +26,7 @@ const OnboardingScreen = ({ navigation }) => {
                 showDone={false}
                 pages={[
                     {
-                        subtitle: (
+                        title: (
                             <View style={styles.page}>
                                 <Text style={styles.title}>Welcome to Aura</Text>
                                 <Text style={styles.subtitle}>Smart comfort that adapts to you.</Text>
@@ -110,43 +110,51 @@ const styles = StyleSheet.create ({
         flex: 1,
     },
     container: {
-        // flexShrink: 0,
-        // width: 402,
-        // height: 874,
-        // alignItems: 'left',
-        // paddingLeft: 25,
+        flexShrink: 1,
+        width: 402,
+        height: 874,
+        alignItems: 'left',
+        paddingLeft: 25,
         
     },
     page: {
+        flex: 1,
         padding: 20,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
+        justifyContent: 'center',  
+        alignItems: 'center',   
+        backgroundColor: '#fff',
+      },
     title: {
         fontSize: 24,
+        paddingBottom: 15,
     },
     subtitle: {
         fontSize: 18,
-        fontWeight: 'medium',
-        // textAlign: 'left',
-        // paddingTop: 20,
-        // paddingBottom: 8,
-        // justifyContent: 'left',
-        // alignItems: 'left',
+        fontWeight: '400',
+        paddingBottom: 15,
     },
     text: {
         fontSize: 14,
-        fontWeight: 'medium',
+        textAlign: 'center',      
+        color: '#444',
+        marginHorizontal: 20,
+        marginBottom: 20,
     },
-    buttonText: {
-        borderWidth: 0.2,
-        alignItems: 'center',
-        padding: 15,
-        borderRadius: 10,
+    button: {
         backgroundColor: '#A3C858C9',
         width: 350,
         height: 50,
-    },
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 20,
+      },
+      buttonText: {
+        color: '#000',
+        fontSize: 16,
+        fontWeight: '600',
+      },
+      
     input: {
         color: 'black',
         width: 350,
