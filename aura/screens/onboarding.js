@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react';
+import React, {useState, useCallback, useRef } from 'react';
 import {View, Text, Image, ScrollView, TextInput, Button, StyleSheet, TouchableOpacity, SafeAreaView} from 'react-native';
 import Onboarding from 'react-native-onboarding-swiper';
 import { RadioButton } from 'react-native-paper';
@@ -11,18 +11,35 @@ const OnboardingScreen = ({ navigation }) => {
 
     //terms & conditions button
     const [isSelected, setIsSelected] = useState(false);
+    
+    //to create own buttons
+    const swiperRef = useRef(null);
 
     return (
         <SafeAreaView style={styles.safeArea}>
             <Onboarding
                 // onSkip={() => navigation.replace('Home')}
                 // onDone={() => navigation.replace('Home')}
+                ref={swiperRef}
+                showNext={false} 
+                showSkip={false}
+                showDone={false}
                 pages={[
                     {
-                        backgroundColor: '#fff',
-                        title: 'Welcome to Aura',
-                        // image: <Image source={require('./Images/Screenshot 2025-06-02 at 3.01.38 PM.png')} />,
-                        subtitle: 'Smart comfort that adapts to you.',
+                        title: (
+                            <View style={styles.page}>
+                                <Text style={styles.title}>Welcome to Aura</Text>
+                                <Text style={styles.subtitle}>Smart comfort that adapts to you.</Text>
+                                {/* <Image source={require('../assets/image-placeholder.png')} style={styles.image} /> */}
+                                <Text style={styles.text}>Aura's mission aims to promote environmental sustainability and reduced utility costs.</Text>
+                                <TouchableOpacity 
+                                    style={styles.button}
+                                    onPress={() => swiperRef.current?.goToPage(1, true)}
+                                >
+                                    <Text style={styles.buttonText}>Get Started</Text>
+                                </TouchableOpacity>
+                            </View>
+                        )
                     },
                     {
                         backgroundColor: '#fff',
@@ -49,6 +66,7 @@ const OnboardingScreen = ({ navigation }) => {
                                     style={styles.input}
                                     placeholder='*****'
                                     defaultValue={text}
+                                    secureTextEntry
                                     // onChangeText={setUsername}
                                 />
                                 <View style={styles.radioGroup}>
@@ -92,21 +110,51 @@ const styles = StyleSheet.create ({
         flex: 1,
     },
     container: {
-        flexShrink: 0,
+        flexShrink: 1,
         width: 402,
         height: 874,
         alignItems: 'left',
         paddingLeft: 25,
+        
+    },
+    page: {
+        flex: 1,
+        padding: 20,
+        justifyContent: 'center',  
+        alignItems: 'center',   
+        backgroundColor: '#fff',
+      },
+    title: {
+        fontSize: 24,
+        paddingBottom: 15,
     },
     subtitle: {
         fontSize: 18,
-        fontWeight: 'medium',
-        textAlign: 'left',
-        paddingTop: 20,
-        paddingBottom: 8,
-        justifyContent: 'left',
-        alignItems: 'left',
+        fontWeight: '400',
+        paddingBottom: 15,
     },
+    text: {
+        fontSize: 14,
+        textAlign: 'center',      
+        color: '#444',
+        marginHorizontal: 20,
+        marginBottom: 20,
+    },
+    button: {
+        backgroundColor: '#A3C858C9',
+        width: 350,
+        height: 50,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 20,
+      },
+      buttonText: {
+        color: '#000',
+        fontSize: 16,
+        fontWeight: '600',
+      },
+      
     input: {
         color: 'black',
         width: 350,
