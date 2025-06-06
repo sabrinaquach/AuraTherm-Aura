@@ -1,55 +1,37 @@
-import React, {useState, useCallback, useRef } from 'react';
-import {View, Text, Image, ScrollView, TextInput, Button, StyleSheet, TouchableOpacity, SafeAreaView} from 'react-native';
+import React, {useState } from 'react';
+import {View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { RadioButton } from 'react-native-paper';
+import Input from '../component/input.js'
+import Button from '../component/button.js'
 
 const Account = ({ navigation }) => {
-    const [text, setText] = useState('');
-    const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [isSelected, setIsSelected] = useState(false);
-    
-    // const [errors, setErrors] = useState('');
-    // const validate = () => {
-    //     Keyboard.dismiss();
-    //     if(!InputAccessoryView.email) {
-    //         handleError('Please input email', 'email');
-    //     }
-    // };
-    // const handleOnChange = (text, input) => {
-    //     setInputs(prevState => ({...prevState, [input]: text}));
-    // };
+    //error handling for input boxes
+    const [isFocused, setIsFocused] = useState(false);
 
+    //terms and condition radio button
+    const [isSelected, setIsSelected] = useState(false);
 
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Create An Account</Text>
-            <Text style={styles.subtitle}>Username</Text>
-            <TextInput
-                style={styles.input}
-                placeholder='johnsmith'
-                placeholderTextColor='gray'
-                defaultValue={text}
-                // onChangeText={text => handleOnChange(text, 'username')}
-            />
-            <Text style={styles.subtitle}>Email</Text>
-            <TextInput
-                style={styles.input}
-                placeholder='johnsmith@gmail.com'
-                placeholderTextColor='gray'
-                defaultValue={text}
-                // error={errors.email}
-                // onChangeText={text => handleOnChange(text, 'email')}
-            />
-            <Text style={styles.subtitle}>Password</Text>
-            <TextInput
-                style={styles.input}
-                placeholder='Password must be at least 8 characters'
-                placeholderTextColor='gray'
-                defaultValue={text}
-                secureTextEntry
-                // onChangeText={text => handleOnChange(text, 'password')}
-            />
+            <View> 
+                <Input
+                    label="Username"
+                    placeholder='Enter your username'
+                    placeholderTextColor='gray'
+                />
+                <Input
+                    label="Email"
+                    placeholder='Enter your email address'
+                    placeholderTextColor='gray'
+                />
+                <Input
+                    label="Password"
+                    placeholder='Enter a password that is at least 8 characters'
+                    placeholderTextColor='gray'
+                    password
+                />
+            </View>
             <View style={styles.radioGroup}>
                 <View style={styles.radioButton}>
                     <RadioButton
@@ -74,14 +56,13 @@ const Account = ({ navigation }) => {
                 </View>
                 </View>
             </View>
-            <View style={styles.buttonContainer}>
-            <TouchableOpacity 
-                style={styles.button}
-                onPress={() => navigation.navigate('Preferences')}
+            <Button title="Start Setting My Preferences"/>
+            <Text 
+                style={styles.loginDescription}
+                onPress={() => navigation.navigate('Login')}
             >
-                <Text style={styles.buttonText}>Start Setting My Preferences</Text>
-            </TouchableOpacity>
-            </View>
+                Already have an account? Login
+            </Text>
         </View>
     )
 }
@@ -135,25 +116,10 @@ const styles = StyleSheet.create ({
         fontSize: 16,
         color: '#757575',
     },
-    buttonContainer: {
-        flex: 1,
-        justifyContent: 'center',  
-        alignItems: 'center',   
+    loginDescription: {
+        fontSize: 14,
+        fontWeight: '500',
+        textAlign: 'center',
+        bottom: 40,
     },
-    button: {
-        backgroundColor: '#A3C858C9',
-        width: '100%',
-        height: 50,
-        borderRadius: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
-        position: 'absolute',
-        bottom: 50,
-        borderWidth: 0.2,
-      },
-      buttonText: {
-        color: '#000',
-        fontSize: 16,
-        fontWeight: '600',
-      },
 });
