@@ -1,12 +1,13 @@
 import React from 'react';
 import { Text, TouchableOpacity, StyleSheet, View } from 'react-native';
 
-const Button = ({title, navigation, onPress = () => {}}) => {
+const Button = ({title, navigation, backgroundColor="#000", onPress = () => {}}) => {
     return (
         <View style={styles.buttonContainer}>
             <TouchableOpacity 
+                activeOpacity={0.7}
                 onPress={onPress}
-                style={styles.button}
+                style={[styles.button, { backgroundColor }]}
                 // onPress={() => navigation.navigate('')}
             >
                 <Text style={styles.buttonText}>{title}</Text>
@@ -24,7 +25,6 @@ const styles = StyleSheet.create ({
         alignItems: 'center',   
     },
     button: {
-        backgroundColor: '#A3C858C9',
         width: '100%',
         height: 50,
         borderRadius: 10,

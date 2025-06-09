@@ -1,8 +1,11 @@
-import React, {useEffect, useState, useCallback, useRef } from 'react';
-import {View, Text, Image, ScrollView, TextInput, Button, StyleSheet, TouchableOpacity, SafeAreaView} from 'react-native';
+import React from 'react';
+import {View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+
+import Button from '../component/button.js'
 
 const Welcome = ({ navigation }) => {
     return (
+        
         <View style={styles.container}>
             <Text style={styles.title}>Welcome to Aura</Text>
             <Text style={styles.subtitle}>Smart comfort that adapts to you.</Text>
@@ -11,12 +14,11 @@ const Welcome = ({ navigation }) => {
                 style={[styles.image, {resizeMode: 'contain'}]} 
             />
             <Text style={styles.text}>Aura's mission aims to promote environmental sustainability and reduced utility costs.</Text>
-            <TouchableOpacity 
-                style={styles.button}
-                onPress={() => navigation.navigate('Account')}
-            >
-                <Text style={styles.buttonText}>Get Started</Text>
-            </TouchableOpacity>
+            <Button 
+                backgroundColor="#A3C858C9"
+                title="Get Started"
+                onPress={() => navigation.navigate('RegisterAccount')}
+            />
         </View>
     )
 }
@@ -25,10 +27,11 @@ export default Welcome;
 
 const styles = StyleSheet.create ({
     container: {
-        flex: 1,
-        padding: 20,
         justifyContent: 'center',  
         alignItems: 'center',   
+        flex: 1,
+        paddingTop: 250,
+        paddingHorizontal: 20, 
         backgroundColor: '#fff',
       },
     title: {
