@@ -142,7 +142,10 @@ const RegisterAccount = ({ navigation }) => {
                             onPress={() => {
                                 navigation.navigate('Terms', 
                                 {
-                                    onAgree: () => setIsSelected(true),
+                                    onAgree: () => {
+                                        setIsSelected(true);
+                                        handleError(null, 'terms');
+                                    },
                                     onReject: () => setIsSelected(false),
                                 })
                             }}
