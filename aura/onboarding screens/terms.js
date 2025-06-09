@@ -1,6 +1,8 @@
 import React from 'react';
 import {View, Text, ScrollView, StyleSheet, SafeAreaView, TouchableOpacity} from 'react-native';
 
+import Button from '../component/button.js'
+
 const TermsAndConditions = ({ navigation, route }) => {
     const acceptedTerm = () => {
         if (route.params?.onAgree) {
@@ -74,15 +76,12 @@ const TermsAndConditions = ({ navigation, route }) => {
                         Terms and Conditions.
                     </Text>
                 </View>
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={styles.agreeButton} onPress={acceptedTerm}>
-                        <Text style={styles.buttonAgreeText}>I agree to the Terms and Conditions</Text>
-                    </TouchableOpacity>
-                </View>
-                    <TouchableOpacity style={styles.rejectButton} onPress={rejectedTerm}>
-                        <Text style={styles.buttonRejectText}>I do not agree</Text>
-                    </TouchableOpacity>
             </ScrollView>
+            <View style={styles.buttonContainer}>
+                    <Button backgroundColor="#A3C858C9" title="I agree to the Terms and Conditions" onPress={acceptedTerm} />
+                    <View style={{ height: 60 }} />
+                    <Button backgroundColor="#E3EFCD" title="I do not agree" onPress={rejectedTerm} />
+            </View>
         </SafeAreaView>
     )
 };
@@ -94,7 +93,6 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     container: {
-        flex: 1,
         padding: 20,
     },
     title: {
@@ -112,35 +110,10 @@ const styles = StyleSheet.create({
     text: {
         fontSize: 16,
     },
-    agreeButton: {
-        borderWidth: 0.2,
-        alignItems: 'center',
-        padding: 15,
-        borderRadius: 10,
-        backgroundColor: '#A3C858C9',
-        width: '100%',
-        height: 50,
-    },
-    rejectButton: {
-        borderWidth: 0.2,
-        alignItems: 'center',
-        padding: 15,
-        borderRadius: 10,
-        backgroundColor: '#E3EFCD',
-        width: '100%',
-        height: 50,
-    },
-    buttonAgreeText: {
-        color: '#000',
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    buttonRejectText: {
-        color: '#000',
-        fontSize: 16,
-    },
     buttonContainer: {
-        paddingBottom: 10,
+        paddingHorizontal: 20,
+        paddingTop: 60,
+        top: 55,
     },
 });
 
