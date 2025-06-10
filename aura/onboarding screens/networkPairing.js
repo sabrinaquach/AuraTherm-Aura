@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
+import onboardingStyle from '../style/onboardingStyle.js';
 import Button from '../component/button.js'
 
 const NetworkPairing = ({ navigation }) => {

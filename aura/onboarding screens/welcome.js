@@ -1,20 +1,21 @@
 import React from 'react';
 import {View, Text, Image, StyleSheet } from 'react-native';
 
+import onboardingStyle from '../style/onboardingStyle.js';
 import Button from '../component/button.js'
 import DotProgress from'../component/dotIndicator.js'
 
 const Welcome = ({ navigation }) => {
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Welcome to Aura</Text>
-            <Text style={styles.subtitle}>Smart comfort that adapts to you.</Text>
+            <Text style={onboardingStyle.title}>Welcome to Aura</Text>
+            <Text style={onboardingStyle.subtitle}>Smart comfort that adapts to you.</Text>
             <Image 
                 source={require('../assets/undraw_ordinary-day_ak4e.png')} 
-                style={[styles.image, {resizeMode: 'contain'}]} 
+                style={[onboardingStyle.image, {resizeMode: 'contain'}]} 
             />
-            <Text style={styles.text}>Aura's mission aims to promote environmental sustainability and reduced utility costs.</Text>
-            <View style={styles.dotIndicator}>
+            <Text style={onboardingStyle.text}>Aura's mission aims to promote environmental sustainability and reduced utility costs.</Text>
+            <View style={onboardingStyle.dotIndicator}>
                 <DotProgress 
                     total={5} current={0}
                     title="Welcome"
@@ -31,38 +32,20 @@ const Welcome = ({ navigation }) => {
 
 export default Welcome;
 
-const styles = StyleSheet.create ({
-    container: {
-        justifyContent: 'center',  
-        alignItems: 'center',   
-        flex: 1,
-        paddingTop: 200,
-        paddingHorizontal: 20, 
-        backgroundColor: '#fff',
-      },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        paddingBottom: 15,
-    },
-    image: {
-        width: 800,
-        height: 230,
-    },
-    subtitle: {
-        fontSize: 20,
-        fontWeight: '500',
-        paddingBottom: 15,
-    },
-    text: {
-        fontSize: 16,
-        textAlign: 'center',      
-        color: '#444',
-        marginHorizontal: 20,
-        marginBottom: 20,
-    },
-    dotIndicator: {
-        width: '100%',             
-        paddingTop: 20,
-    },
+const styles = StyleSheet.create ({ 
+container: {
+    justifyContent: 'center',  
+    alignItems: 'center',   
+    flex: 1,
+    paddingTop: 200,
+    paddingHorizontal: 20, 
+    backgroundColor: '#fff',
+},
+// dotIndicator: {          
+//     top: 610,
+//     position: 'absolute',
+//     bottom: 0,
+//     left: 20,
+//     right: 0,
+// },
 });
