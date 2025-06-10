@@ -37,6 +37,13 @@ export default function MainContainer() {
 
                         return <Icon name={iconName} size={size} color={color}/>
                     },
+
+                    tabBarActiveTintColor: '#A3C858',
+                    tabBarInactiveTintColor: 'gray',
+
+                    tabBarStyle: {
+                        borderTopWidth: 0,
+                    },
                 })}
             >
                 <Tab.Screen name={homeName} component={HomeScreen} options={{ headerShown: false }}/>
