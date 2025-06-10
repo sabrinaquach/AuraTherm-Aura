@@ -5,7 +5,7 @@ import onboardingStyle from '../style/onboardingStyle.js';
 import Button from '../component/button.js'
 import DotProgress from'../component/dotIndicator.js'
 
-const Final = ({ navigation }) => {
+const Final = ({ navigation, onFinish }) => {
     return (
         <View style={styles.container}>
             <Text style={onboardingStyle.title}>You’re All Set!</Text>
@@ -23,7 +23,7 @@ const Final = ({ navigation }) => {
             <Button 
                 backgroundColor="#A3C858C9"
                 title="Go To Home"
-                onPress={() => navigation.navigate('Home')}
+                onPress={() => navigation.navigate('MainScreens')}
             />
         </View>
     )
