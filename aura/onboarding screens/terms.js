@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, ScrollView, StyleSheet, SafeAreaView, TouchableOpacity} from 'react-native';
+import {View, Text, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
 
 import Button from '../component/button.js'
 

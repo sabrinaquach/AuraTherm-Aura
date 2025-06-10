@@ -1,10 +1,12 @@
-import React, {useState } from 'react';
-import {View, Text, StyleSheet, Keyboard, Alert } from 'react-native';
+import React, { useState } from 'react';
+import {View, Text, Keyboard, Alert, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import onboardingStyle from '../style/onboardingStyle.js';
 import Input from '../component/input.js'
 import Button from '../component/button.js'
 import Loader from '../component/loader.js'
+import DotProgress from'../component/dotIndicator.js'
 
 const Login = ({ navigation }) => {
     const [inputs, setInputs] = useState({
@@ -52,7 +54,7 @@ const Login = ({ navigation }) => {
                         'user', 
                         JSON.stringify({...userData, loggedIn : true}),
                 );
-                navigation.navigate("NetworkPairing");
+                navigation.navigate("Preferences");
                 } else {
                     Alert.alert('Error', 'Invalid details');
                 }
@@ -73,7 +75,7 @@ const Login = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <Loader visible={loading} label="Logging Into Your Account..."/>
-            <Text style={styles.title}>Login</Text>
+            <Text style={onboardingStyle.title}>Login</Text>
             <View> 
                 <Input
                     label="Username"
@@ -97,6 +99,12 @@ const Login = ({ navigation }) => {
                     password
                 />
             </View>
+            <View style={onboardingStyle.dotIndicator}>
+                <DotProgress 
+                    total={5} current={1}
+                    title="Login to Your Account"
+                />
+            </View>
             <Button 
                 backgroundColor="#A3C858C9"
                 title="Login" 
@@ -104,7 +112,7 @@ const Login = ({ navigation }) => {
                 onPress={validate}
             />
             <Text 
-                style={styles.registerDescription}
+                style={onboardingStyle.registerDescription}
                 onPress={() => navigation.navigate('RegisterAccount')}
             >
                 Don't have an account? Register
@@ -122,35 +130,11 @@ const styles = StyleSheet.create ({
         paddingHorizontal: 20, 
         backgroundColor: '#fff',
     },
-    input: {
-        color: 'black',
-        width: '100%',
-        height: 45,
-        borderWidth: 1,
-        borderRadius: 10,
-        borderColor: '#D9D9D9',
-        padding: 10,
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-    },
-    subtitle: {
-        fontSize: 18,
-        fontWeight: '500',
-        paddingBottom: 5,
-        paddingTop: 20,
-    },
-   registerDescription: {
-        fontSize: 14,
-        fontWeight: '500',
-        textAlign: 'center',
-        bottom: 40,
-    },
-    termsError: {
-        color: 'red',
-        fontSize: 12,
-        marginTop: 5,
-        paddingLeft: 46,
-    },
+    // dotIndicator: {
+    //     top: 615,
+    //     position: 'absolute',
+    //     bottom: 0,
+    //     left: 20,
+    //     right: 0,
+    // },
 });

@@ -3,9 +3,11 @@ import {View, Text, StyleSheet, TouchableOpacity, Keyboard, Alert } from 'react-
 import { RadioButton } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import onboardingStyle from '../style/onboardingStyle.js';
 import Input from '../component/input.js'
 import Button from '../component/button.js'
 import Loader from '../component/loader.js'
+import DotProgress from'../component/dotIndicator.js'
 
 const RegisterAccount = ({ navigation }) => {
     //error handling & validation for input boxes
@@ -86,7 +88,7 @@ const RegisterAccount = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <Loader visible={loading} label="Creating Your Account..."/>
-            <Text style={styles.title}>Create An Account</Text>
+            <Text style={onboardingStyle.title}>Create An Account</Text>
             <View> 
                 <Input
                     label="Username"
@@ -121,8 +123,8 @@ const RegisterAccount = ({ navigation }) => {
                     password
                 />
             </View>
-            <View style={styles.radioGroup}>
-                <View style={styles.radioButton}>
+            <View style={onboardingStyle.radioGroup}>
+                <View style={onboardingStyle.radioButton}>
                     <RadioButton
                         value={isSelected}
                         status={isSelected ? 'checked' : 'unchecked'}
@@ -136,32 +138,41 @@ const RegisterAccount = ({ navigation }) => {
                         color="green"
                         borderWidth="1"
                     />
-                    <View style={styles.learnContainer}>
-                        <Text style={styles.radioLabel}>I accept the terms and privacy policy.</Text>
+                    <View style={onboardingStyle.learnContainer}>
+                        <Text style={onboardingStyle.radioLabel}>I accept the terms and privacy policy.</Text>
                         <TouchableOpacity 
                             onPress={() => {
                                 navigation.navigate('Terms', 
                                 {
-                                    onAgree: () => setIsSelected(true),
+                                    onAgree: () => {
+                                        setIsSelected(true);
+                                        handleError(null, 'terms');
+                                    },
                                     onReject: () => setIsSelected(false),
                                 })
                             }}
                         >
-                        <Text style={styles.linkText}>Learn More</Text>
+                        <Text style={onboardingStyle.linkText}>Learn More</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
             </View>
             {errors.terms && (
-                <Text style={styles.termsError}>{errors.terms}</Text>
+                <Text style={onboardingStyle.termsError}>{errors.terms}</Text>
             )}
+            <View style={onboardingStyle.dotIndicator}>
+                <DotProgress 
+                    total={5} current={1}
+                    title="Set Up Your Account"
+                />
+            </View>
             <Button 
                 backgroundColor="#A3C858C9"
                 title="Register" 
                 onPress={validate}
             />
             <Text 
-                style={styles.loginDescription}
+                style={onboardingStyle.loginDescription}
                 onPress={() => navigation.navigate('Login')}
             >
                 Already have an account? Login
@@ -178,57 +189,11 @@ const styles = StyleSheet.create ({
         paddingHorizontal: 20, 
         backgroundColor: '#fff',
     },
-    input: {
-        color: 'black',
-        width: '100%',
-        height: 45,
-        borderWidth: 1,
-        borderRadius: 10,
-        borderColor: '#D9D9D9',
-        padding: 10,
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-    },
-    subtitle: {
-        fontSize: 18,
-        fontWeight: '500',
-        paddingBottom: 5,
-        paddingTop: 20,
-    },
-    radioGroup: {
-        flexDirection: 'row', 
-        alignItems: 'left', 
-        marginTop: 20, 
-      },
-    radioButton: {
-        flexDirection: 'row', 
-        alignItems: 'center',         
-    },
-    learnContainer: {
-        flexDirection: 'column',
-    },
-    radioLabel: {
-        marginLeft: 8, 
-        fontSize: 16,
-        color: '#333',
-    },
-    linkText: {
-        marginLeft: 8, 
-        fontSize: 16,
-        color: '#757575',
-    },
-    loginDescription: {
-        fontSize: 14,
-        fontWeight: '500',
-        textAlign: 'center',
-        bottom: 40,
-    },
-    termsError: {
-        color: 'red',
-        fontSize: 12,
-        marginTop: 5,
-        paddingLeft: 46,
-    },
+    // dotIndicator: {
+    //     top: 610,
+    //     position: 'absolute',
+    //     bottom: 0,
+    //     left: 20,
+    //     right: 0,
+    // },
 });
