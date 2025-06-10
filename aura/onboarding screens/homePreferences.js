@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { SelectList } from 'react-native-dropdown-select-list';
 import Slider from '@react-native-community/slider';
+import Icon from 'react-native-vector-icons/Feather';
+
+import Button from '../component/button.js'
+import DotProgress from'../component/dotIndicator.js'
 
 const Preferences = ({ navigation }) => {
     //dropdowns
@@ -20,10 +24,10 @@ const Preferences = ({ navigation }) => {
         {key:'4', value: '76°F – 80°F (Warm)'},
     ]
     const celsiusTemp = [
-        {key:'1', value: '16°C – 18°C (Cool)'},
-        {key:'2', value: '19°C – 21°C (Mild Cool)'},
-        {key:'3', value: '22°C – 24°C (Neutral)'},
-        {key:'4', value: '25°C – 27°C (Warm)'},
+        {key:'a', value: '16°C – 18°C (Cool)'},
+        {key:'b', value: '19°C – 21°C (Mild Cool)'},
+        {key:'c', value: '22°C – 24°C (Neutral)'},
+        {key:'d', value: '25°C – 27°C (Warm)'},
     ]
 
     //slider
@@ -44,6 +48,10 @@ const Preferences = ({ navigation }) => {
                       data={temperatureUnit}
                       placeholder="Select Temperature Unit"
                       save="key"
+                      inputStyles={{padding: 1}}
+                      arrowicon={<Icon name="chevron-down" size={20} color="#333" />}
+                      searchicon={<Icon name="search" size={20} color="#333" paddingRight={5} />}
+                      closeicon={<Icon name="x" size={20} color="#333" />}
                 />
                 
                 <Text style={styles.subtitle}>Temperature Preferences</Text>
@@ -51,13 +59,17 @@ const Preferences = ({ navigation }) => {
                     setSelected={setTempPreferences}
                     data={tempOptions}
                     placeholder="Select Temperature Range"
+                    inputStyles={{padding: 1}}
+                    arrowicon={<Icon name="chevron-down" size={20} color="#333" />}
+                    searchicon={<Icon name="search" size={20} color="#333" paddingRight={5} />}
+                      closeicon={<Icon name="x" size={20} color="#333" />}
                 />
             </View>
             <View style={styles.sliderContainer}>
                 <Text style={styles.subtitle}>Choose the Setting That Fits You</Text>
                 <View style={styles.labelsContainer}>
                     {labels.map((label) => (
-                        <Text style={styles.label}>{label}</Text>
+                        <Text key={label} style={styles.labelText}>{label}</Text>
                     ))}
                 </View>
                 <Slider 
@@ -73,14 +85,17 @@ const Preferences = ({ navigation }) => {
                 />
                 <Text style={styles.text}>Aura adapts your comfort based on your energy priorities — you can always change it later.</Text>
             </View>
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity 
-                    style={styles.button}
-                    onPress={() => navigation.navigate('NetworkPairing')}
-                >
-                    <Text style={styles.buttonText}>Pair Device to Network</Text>
-                </TouchableOpacity>
+            <View style={styles.dotIndicator}>
+                <DotProgress 
+                    total={5} current={2}
+                    title="Preferences"
+                />
             </View>
+            <Button 
+                backgroundColor="#A3C858C9"
+                title="Pair Device to Network" 
+                onPress={() => navigation.navigate('NetworkPairing')}
+            />
         </View>
     )
 }
@@ -113,7 +128,7 @@ const styles = StyleSheet.create ({
         marginBottom: -2,
         paddingHorizontal: 5,
       },
-    label: {
+    labelText: {
         fontSize: 16,
         fontWeight: 500,
         paddingTop: 15,
@@ -121,28 +136,10 @@ const styles = StyleSheet.create ({
     text: {
         fontSize: 13,
     },
-    buttonContainer: {
-        flex: 1,
-        justifyContent: 'center',  
-        alignItems: 'center',   
-    },
-    button: {
-        backgroundColor: '#A3C858C9',
-        width: '100%',
-        height: 50,
-        borderRadius: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
-        position: 'absolute',
-        bottom: 50,
-        borderWidth: 0.2,
-      },
-    buttonText: {
-        color: '#000',
-        fontSize: 16,
-        fontWeight: '600',
-    },
     sliderContainer: {
         paddingTop: 40,
+    },
+    dotIndicator: {
+        top: 95,
     },
 })

@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Input from '../component/input.js'
 import Button from '../component/button.js'
 import Loader from '../component/loader.js'
+import DotProgress from'../component/dotIndicator.js'
 
 const RegisterAccount = ({ navigation }) => {
     //error handling & validation for input boxes
@@ -158,6 +159,12 @@ const RegisterAccount = ({ navigation }) => {
             {errors.terms && (
                 <Text style={styles.termsError}>{errors.terms}</Text>
             )}
+            <View style={styles.dotIndicator}>
+                <DotProgress 
+                    total={5} current={1}
+                    title="Set Up Your Account"
+                />
+            </View>
             <Button 
                 backgroundColor="#A3C858C9"
                 title="Register" 
@@ -233,5 +240,12 @@ const styles = StyleSheet.create ({
         fontSize: 12,
         marginTop: 5,
         paddingLeft: 46,
+    },
+    dotIndicator: {
+        top: 615,
+        position: 'absolute',
+        bottom: 0,
+        left: 20,
+        right: 0,
     },
 });

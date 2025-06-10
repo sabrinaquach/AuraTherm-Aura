@@ -1,10 +1,17 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
+import Button from '../component/button.js'
+
 const NetworkPairing = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Select Your Wifi Network</Text>
+            <Button 
+                backgroundColor="#A3C858C9"
+                title="Next"
+                onPress={() => navigation.navigate('Final')}
+            />
         </View>
     )
 }

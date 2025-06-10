@@ -4,32 +4,31 @@ import {View, Text, Image, StyleSheet } from 'react-native';
 import Button from '../component/button.js'
 import DotProgress from'../component/dotIndicator.js'
 
-const Welcome = ({ navigation }) => {
+const Final = ({ navigation }) => {
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Welcome to Aura</Text>
-            <Text style={styles.subtitle}>Smart comfort that adapts to you.</Text>
+            <Text style={styles.title}>You’re All Set!</Text>
+            <Text style={styles.subtitle}>Aura is now adjusting to fit your preferences...</Text>
             <Image 
-                source={require('../assets/undraw_ordinary-day_ak4e.png')} 
+                source={require('../assets/undraw_relaxing-at-home_vmps.png')} 
                 style={[styles.image, {resizeMode: 'contain'}]} 
             />
-            <Text style={styles.text}>Aura's mission aims to promote environmental sustainability and reduced utility costs.</Text>
             <View style={styles.dotIndicator}>
                 <DotProgress 
-                    total={5} current={0}
-                    title="Welcome"
+                    total={5} current={4}
+                    title="Great, you're done!"
                 />
             </View>
             <Button 
                 backgroundColor="#A3C858C9"
-                title="Get Started"
-                onPress={() => navigation.navigate('RegisterAccount')}
+                title="Go To Home"
+                onPress={() => navigation.navigate('Home')}
             />
         </View>
     )
 }
 
-export default Welcome;
+export default Final;
 
 const styles = StyleSheet.create ({
     container: {
@@ -53,16 +52,10 @@ const styles = StyleSheet.create ({
         fontSize: 20,
         fontWeight: '500',
         paddingBottom: 15,
-    },
-    text: {
-        fontSize: 16,
-        textAlign: 'center',      
-        color: '#444',
-        marginHorizontal: 20,
-        marginBottom: 20,
+        textAlign: 'center',
     },
     dotIndicator: {
         width: '100%',             
-        paddingTop: 20,
+        paddingTop: 70,
     },
 });
