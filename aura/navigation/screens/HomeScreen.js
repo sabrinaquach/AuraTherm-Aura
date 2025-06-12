@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-import MainScreensStyle from '../styles/MainScreenStyles';
+import MainScreensStyle from '../../style/MainScreenStyles';
 
 export default function HomeScreen ({ navigation }) {
     return (

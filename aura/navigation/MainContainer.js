@@ -39,10 +39,14 @@ export default function MainContainer() {
                     },
 
                     tabBarActiveTintColor: '#A3C858',
-                    tabBarInactiveTintColor: 'gray',
+                    tabBarInactiveTintColor: 'black',
 
                     tabBarStyle: {
                         borderTopWidth: 0,
+                        strokeWidth: 2,
+                    },
+                    tabBarLabelStyle: {
+                        padding: 2,
                     },
                 })}
             >

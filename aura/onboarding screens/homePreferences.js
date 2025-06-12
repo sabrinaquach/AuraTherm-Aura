@@ -110,37 +110,4 @@ const styles = StyleSheet.create ({
         paddingHorizontal: 20, 
         backgroundColor: '#fff',
     },
-    // title: {
-    //     fontSize: 28,
-    //     fontWeight: 'bold',
-    // },
-    // subtitle: {
-    //     fontSize: 20,
-    //     fontWeight: '500',
-    //     paddingTop: 15,
-    //     paddingBottom: 5,
-    // },
-    // preferencesContainer: {
-    //     paddingBottom: 15,
-    // },
-    // labelsContainer: {
-    //     flexDirection: 'row',
-    //     justifyContent: 'space-between',
-    //     marginBottom: -2,
-    //     paddingHorizontal: 5,
-    //   },
-    // labelText: {
-    //     fontSize: 16,
-    //     fontWeight: 500,
-    //     paddingTop: 15,
-    // },
-    // text: {
-    //     fontSize: 13,
-    // },
-    // sliderContainer: {
-    //     paddingTop: 40,
-    // },
-    // dotIndicator: {
-    //     top: 95,
-    // },
 })

@@ -28,6 +28,31 @@ const MainScreensStyle = StyleSheet.create ({
         marginHorizontal: 20,
         marginBottom: 20,
     },
+    preferencesContainer: {
+        paddingBottom: 15,
+    },
+    labelsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: -2,
+        paddingHorizontal: 5,
+      },
+    labelText: {
+        fontSize: 16,
+        fontWeight: 500,
+        paddingTop: 15,
+    },
+    sliderContainer: {
+        paddingTop: 40,
+    },
+    profileContainer: {
+        alignItems: 'center',
+        justifyContent: 'flex-start'
+
+    },
+    usernameText: {
+        // marginTop: 10,
+    },
 });
 
 export default MainScreensStyle;
