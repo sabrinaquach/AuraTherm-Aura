@@ -32,8 +32,8 @@ const Preferences = ({ navigation }) => {
     ]
 
     //slider
-    const [value, setValue] = useState(1);
-    const labels = ['Comfort', 'Eco', 'Balanced'];
+    const [Energyvalue, setEnergyValue] = useState(1);
+    const Energylabels = ['Comfort', 'Eco', 'Balanced'];
 
     return (
         <View style={styles.container}>
@@ -69,7 +69,7 @@ const Preferences = ({ navigation }) => {
             <View style={onboardingStyle.sliderContainer}>
                 <Text style={onboardingStyle.subtitle}>Choose the Setting That Fits You</Text>
                 <View style={onboardingStyle.labelsContainer}>
-                    {labels.map((label) => (
+                    {Energylabels.map((label) => (
                         <Text key={label} style={onboardingStyle.labelText}>{label}</Text>
                     ))}
                 </View>
@@ -78,8 +78,8 @@ const Preferences = ({ navigation }) => {
                     minimumValue={0}
                     maximumValue={2}
                     step={1}
-                    value={value}
-                    onValueChange={setValue}
+                    value={Energyvalue}
+                    onValueChange={setEnergyValue}
                     minimumTrackTintColor="#D9D9D9"
                     maximumTrackTintColor="#D9D9D9"
                     thumbTintColor="#A3C858C9"

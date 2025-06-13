@@ -77,11 +77,13 @@ const styles = StyleSheet.create ({
     },
     decisionColumn: {
         flexDirection: 'column',
+        paddingBottom: 15,
     },
     optionButton: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 15,
         gap: 10,
+        // paddingBottom: 30,
       },
 });

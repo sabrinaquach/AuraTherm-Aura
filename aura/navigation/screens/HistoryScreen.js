@@ -10,7 +10,7 @@ export default function HistoryScreen ({ navigation }) {
                 style={MainScreensStyle.title}
                 onPress={() => navigation.navigate('Home')}
             >
-            History</Text>
+            Aura</Text>
         </View>
     );
 }

@@ -8,9 +8,9 @@ export default function HomeScreen ({ navigation }) {
         <View style={MainScreensStyle.container}>
             <Text 
                 style={MainScreensStyle.title}
-                onPress={() => alert('This is the "Home" Screen.')}
+                onPress={() => navigation.navigate('Home')}
             >
-            Home</Text>
+            Aura</Text>
         </View>
     );
 }

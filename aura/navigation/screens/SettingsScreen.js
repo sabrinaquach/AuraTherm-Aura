@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { SelectList } from 'react-native-dropdown-select-list';
 import Slider from '@react-native-community/slider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -29,15 +29,27 @@ export default function SettingsScreen ({ navigation }) {
 
     //profile - upload image
     const [image, setImage] = useState();
-    const uploadImage = async () => {
+    const uploadImage = async (mode) => {
         try {
-            await ImagePicker.requestCameraPermissionsAsync();
-            let result = await ImagePicker.launchCameraAsync({
-                cameraType: ImagePicker.CameraType.front,
-                allowsEditing: true,
-                aspect: [1, 1],
-                quality: 1,
-            });
+            let result = {};
+
+            if (mode === "gallery") {
+                await ImagePicker.requestMediaLibraryPermissionsAsync();
+                result = await ImagePicker.launchImageLibraryAsync({
+                    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                    allowsEditing: true,
+                    aspect: [1, 1],
+                    quality: 1,
+                });
+            } else {
+                await ImagePicker.requestCameraPermissionsAsync();
+                result = await ImagePicker.launchCameraAsync({
+                    cameraType: ImagePicker.CameraType.front,
+                    allowsEditing: true,
+                    aspect: [1, 1],
+                    quality: 1,
+                });
+            }
 
             if (!result.canceled) {
                 await saveImage(result.assets[0].uri);
@@ -58,16 +70,18 @@ export default function SettingsScreen ({ navigation }) {
     };
 
     //slider
-    const [value, setValue] = useState(1);
-    const labels = ['Low', 'High'];
-
+    const [Occupancyvalue, setOccupancyValue] = useState(1);
+    const [Energyvalue, setEnergyValue] = useState(1);
+    const Occupancylabels = ['Low', 'High'];
+    const Energylabels = ['Comfort', 'Eco', 'Balanced'];
+    
     return (
         <View style={MainScreensStyle.container}>
             <Text 
                 style={MainScreensStyle.title}
                 onPress={() => navigation.navigate('Home')}
             >
-                Settings
+                Aura
             </Text>
             <View style={MainScreensStyle.profileContainer}>
                 <Avatar onButtonPress={() => setModalVisible(true)} uri={image}/>
@@ -78,12 +92,13 @@ export default function SettingsScreen ({ navigation }) {
                         setModalVisible(false);
                     }}
                     onCameraPress={() => uploadImage()}
+                    onGalleryPress={() => uploadImage("gallery")}
                 />
             </View>
             <View style={MainScreensStyle.sliderContainer}>
-                <Text style={MainScreensStyle.subtitle}>Occupancy Sensitivity</Text>
+                <Text style={[MainScreensStyle.subtitle, {paddingBottom: 2}]}>Occupancy Sensitivity</Text>
                 <View style={MainScreensStyle.labelsContainer}>
-                    {labels.map((label) => (
+                    {Occupancylabels.map((label) => (
                         <Text key={label} style={MainScreensStyle.labelText}>{label}</Text>
                     ))}
                 </View>
@@ -91,14 +106,55 @@ export default function SettingsScreen ({ navigation }) {
                     style={{width: '100%', height: 40, position: 'fixed'}}
                     minimumValue={0}
                     maximumValue={2}
-                    step={0.2}
-                    value={value}
-                    onValueChange={setValue}
+                    step={0.1}
+                    value={Occupancyvalue}
+                    onValueChange={setOccupancyValue}
                     minimumTrackTintColor="#D9D9D9"
                     maximumTrackTintColor="#D9D9D9"
                     thumbTintColor="#A3C858C9"
                 />
-                <Text style={MainScreensStyle.text}>Adjust how sensitive the AuraTherm sensor is to motion. Higher sensitivity may trigger temperature changes more frequently.</Text>
+                <Text style={MainScreensStyle.text}>Set how sensitive AuraTherm is to motion—higher levels may change temperature more often.</Text>
+            </View>
+            <View style={MainScreensStyle.secondSliderContainer}>
+            <Text style={[MainScreensStyle.subtitle, {paddingBottom: 2}]}>Energy Priority</Text>
+                <View style={MainScreensStyle.labelsContainer}>
+                    {Energylabels.map((label) => (
+                        <Text key={label} style={MainScreensStyle.labelText}>{label}</Text>
+                    ))}
+                </View>
+                <Slider 
+                    style={{width: '100%', height: 40, position: 'fixed'}}
+                    minimumValue={0}
+                    maximumValue={2}
+                    step={1}
+                    value={Energyvalue}
+                    onValueChange={setEnergyValue}
+                    minimumTrackTintColor="#D9D9D9"
+                    maximumTrackTintColor="#D9D9D9"
+                    thumbTintColor="#A3C858C9"
+                />
+                {/* <Text style={MainScreensStyle.text}>Aura adapts to your comfort.</Text> */}
+            </View>
+            <View style={MainScreensStyle.additionsContainer}>
+                <View style={MainScreensStyle.separator} />
+                <TouchableOpacity style={MainScreensStyle.itemRow}>
+                    <Text style={MainScreensStyle.itemText}>Account Information</Text>
+                    <Icon 
+                        name='chevron-right' 
+                        size={25} 
+                        style={MainScreensStyle.itemIcon}
+                    />
+                </TouchableOpacity>
+                <View style={MainScreensStyle.separator} />
+                <TouchableOpacity style={MainScreensStyle.itemRow}>
+                    <Text style={MainScreensStyle.itemText}>Preferences</Text>
+                    <Icon 
+                        name='chevron-right' 
+                        size={25} 
+                        style={MainScreensStyle.itemIcon}
+                    />
+                </TouchableOpacity>
+                <View style={MainScreensStyle.separator} />
             </View>
         </View>
     );

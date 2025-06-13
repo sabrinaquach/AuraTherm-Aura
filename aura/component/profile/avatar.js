@@ -43,6 +43,9 @@ export default function Avatar ({
 
 const styles = StyleSheet.create ({
     container: {
+        position: 'relative',   
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     image: {
         borderRadius: 75,
@@ -53,13 +56,14 @@ const styles = StyleSheet.create ({
     },
     editButton: {
         left: 85,
-        bottom: 40,
+        bottom: 5,
         backgroundColor: '#EDEDED',
         width: 40,
         height: 40,
         borderRadius: 80,
         borderWidth: 1,
         borderColor: 'white',
+        position: 'absolute'
     },
     icon: {
         left: 4.5,

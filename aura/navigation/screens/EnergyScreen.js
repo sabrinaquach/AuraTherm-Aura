@@ -10,7 +10,7 @@ export default function EnergyScreen ({ navigation }) {
                 style={MainScreensStyle.title}
                 onPress={() => navigation.navigate('Home')}
             >
-            Energy</Text>
+            Aura</Text>
         </View>
     );
 }

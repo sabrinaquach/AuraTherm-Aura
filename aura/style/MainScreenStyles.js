@@ -43,15 +43,40 @@ const MainScreensStyle = StyleSheet.create ({
         paddingTop: 15,
     },
     sliderContainer: {
-        paddingTop: 40,
+        paddingTop: 45,
+    },
+    secondSliderContainer: {
+        paddingTop: 30,
     },
     profileContainer: {
         alignItems: 'center',
-        justifyContent: 'flex-start'
-
+        justifyContent: 'flex-start',
     },
     usernameText: {
-        // marginTop: 10,
+        marginTop: 10,
+        fontSize: 16,
+    },
+    additionsContainer: {
+        marginTop: 80,
+        
+    },
+    itemRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 5,
+        paddingVertical: 10,
+    },
+    itemText: {
+        fontSize: 16,
+    },
+    separator: {
+        height: 1,
+        backgroundColor: '#D9D9D9',
+        width: '100%',
+    },
+    itemIcon: {
+        marginLeft: 'auto',
     },
 });
 

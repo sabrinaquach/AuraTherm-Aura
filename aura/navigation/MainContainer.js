@@ -44,6 +44,7 @@ export default function MainContainer() {
                     tabBarStyle: {
                         borderTopWidth: 0,
                         strokeWidth: 2,
+                        padding: 0,
                     },
                     tabBarLabelStyle: {
                         padding: 2,
