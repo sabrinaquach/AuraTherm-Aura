@@ -84,6 +84,5 @@ const styles = StyleSheet.create ({
         alignItems: 'center',
         paddingVertical: 15,
         gap: 10,
-        // paddingBottom: 30,
       },
 });

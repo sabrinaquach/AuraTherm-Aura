@@ -78,6 +78,29 @@ const MainScreensStyle = StyleSheet.create ({
     itemIcon: {
         marginLeft: 'auto',
     },
+    accountSection: {
+        paddingTop: 10,
+    },
+    editContainer: {
+        alignItems: 'flex-end',
+    },
+    editButton: {
+        fontWeight: '500',
+        fontSize: 15,
+    },
+    accountInfo: {
+        borderWidth: 1,
+        borderRadius: 10,
+        paddingHorizontal: 10,
+        height: 45,
+        lineHeight: 45,
+    },
+    accountInfoLabel: {
+        fontSize: 18,
+        fontWeight: '500',
+        paddingBottom: 5,
+        paddingTop: 20,
+    },
 });
 
 export default MainScreensStyle;

@@ -14,7 +14,8 @@ import Preferences from './aura/onboarding screens/homePreferences.js';
 import NetworkPairing from './aura/onboarding screens/networkPairing.js';
 import Final from './aura/onboarding screens/final.js';
 import MainContainer from './aura/navigation/MainContainer.js';
-
+import AccountInfo from './aura/navigation/screens/settings screens/AccountInfo';
+import EditAccountInfo from './aura/navigation/screens/settings screens/EditAccountInfo'
 // import Onboarding from './aura/onboarding screens/onboardingIndex.js';
 
 const Stack = createNativeStackNavigator();
@@ -32,7 +33,8 @@ export default function OnboardingIndex() {
                 <Stack.Screen name="NetworkPairing" component={NetworkPairing} options={{ headerShown: false }}/>
                 <Stack.Screen name="Final" component={Final} options={{ headerShown: false }}/>
                 <Stack.Screen name="MainScreens" component={MainContainer} options={{ headerShown: false }}/>
-
+                <Stack.Screen name="AccountInfo" component={AccountInfo} options={{ headerShown: false }}/>
+                <Stack.Screen name="EditAccountInfo" component={EditAccountInfo} options={{ headerShown: false }}/>
                 {/* <Stack.Screen name="Onboarding" component={Onboarding} options={{ headerShown: false }}/> */}
             </Stack.Navigator>
         </NavigationContainer>

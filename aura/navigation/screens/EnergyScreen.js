@@ -2,6 +2,7 @@ import * as React from 'react';
 import { View, Text } from 'react-native';
 
 import MainScreensStyle from '../../style/MainScreenStyles';
+import ControlTab from '../../component/controlTab';
 
 export default function EnergyScreen ({ navigation }) {
     return (
@@ -11,6 +12,10 @@ export default function EnergyScreen ({ navigation }) {
                 onPress={() => navigation.navigate('Home')}
             >
             Aura</Text>
+            <ControlTab 
+                labelOne="Weekly"
+                labelTwo="Monthly"
+            />
         </View>
     );
 }
