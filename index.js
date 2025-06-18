@@ -16,26 +16,24 @@ import Final from './aura/onboarding screens/final.js';
 import MainContainer from './aura/navigation/MainContainer.js';
 import AccountInfo from './aura/navigation/screens/settings screens/AccountInfo';
 import EditAccountInfo from './aura/navigation/screens/settings screens/EditAccountInfo'
-// import Onboarding from './aura/onboarding screens/onboardingIndex.js';
 
 const Stack = createNativeStackNavigator();
 
 export default function OnboardingIndex() {
     return (
         <NavigationContainer>
-            <Stack.Navigator>
-                <Stack.Screen name="Splash" component={Splash} options={{ headerShown: false }}/>
-                <Stack.Screen name="Welcome" component={Welcome} options={{ headerShown: false }}/>
-                <Stack.Screen name="RegisterAccount" component={RegisterAccount} options={{ headerShown: false }}/>
-                <Stack.Screen name="Terms" component={TermsAndConditions} options={{ headerShown: false }}/>
-                <Stack.Screen name="Login" component={Login} options={{ headerShown: false }}/>
-                <Stack.Screen name="Preferences" component={Preferences} options={{ headerShown: false }}/>
-                <Stack.Screen name="NetworkPairing" component={NetworkPairing} options={{ headerShown: false }}/>
-                <Stack.Screen name="Final" component={Final} options={{ headerShown: false }}/>
-                <Stack.Screen name="MainScreens" component={MainContainer} options={{ headerShown: false }}/>
-                <Stack.Screen name="AccountInfo" component={AccountInfo} options={{ headerShown: false }}/>
-                <Stack.Screen name="EditAccountInfo" component={EditAccountInfo} options={{ headerShown: false }}/>
-                {/* <Stack.Screen name="Onboarding" component={Onboarding} options={{ headerShown: false }}/> */}
+            <Stack.Navigator screenOptions={{ headerShown: false, animation: 'none' }}>
+                <Stack.Screen name="Splash" component={Splash} />
+                <Stack.Screen name="Welcome" component={Welcome} />
+                <Stack.Screen name="RegisterAccount" component={RegisterAccount} />
+                <Stack.Screen name="Terms" component={TermsAndConditions} />
+                <Stack.Screen name="Login" component={Login} />
+                <Stack.Screen name="Preferences" component={Preferences} />
+                <Stack.Screen name="NetworkPairing" component={NetworkPairing} />
+                <Stack.Screen name="Final" component={Final} />
+                <Stack.Screen name="MainScreens" component={MainContainer} />
+                <Stack.Screen name="AccountInfo" component={AccountInfo} />
+                <Stack.Screen name="EditAccountInfo" component={EditAccountInfo} />
             </Stack.Navigator>
         </NavigationContainer>
     );

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Keyboard, Alert } from 'react-native';
-import { RadioButton } from 'react-native-paper';
+import {View, Text, TouchableOpacity, Keyboard, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/Feather';
 
 import MainScreensStyle from '../../../style/MainScreenStyles';
 import Avatar from '../../../component/profile/avatar';
@@ -158,9 +158,66 @@ const EditAccountInfo = ({ navigation }) => {
         setErrors((prevState) => ({...prevState, [input] : errorMessage}));
     };
 
+    //save changes
+    const [savingChanges, setSavingChanges] = useState(false);
+    const saveChanges = async () => {
+        try {
+            setSavingChanges(true);
+
+            // sendToBackend();
+
+            setSavingChanges(false);
+            navigation.navigate("AccountInfo");
+        } catch ({ message }) {
+            alert(message);
+            setSavingChanges(false);
+        }
+    }
+
+    // const sendToBackend = async () => {
+    //     try {
+    //         const formData = new FormData();
+
+    //         formData.append("username", username);
+    //         formData.append("email", email);
+    //         formData.append("password", password);
+    //         formData.append("image", {
+    //             uri: image,
+    //             type: "image/png",
+    //             name: "product-image",
+    //         });
+
+    //         const config = {
+    //             headers: {
+    //                 "Content-Type": "multipart/form-data",
+    //              },
+    //             transformRequest: () => {
+    //                 return formData;
+    //             },
+    //         };
+
+    //         await axios.post("API link", formData, config);
+
+    //         alert("sucess");
+    //     } catch (error) {
+    //         throw error;
+    //     }
+    // }
+
     return (
         <View style={MainScreensStyle.container}>
-            <Text style={MainScreensStyle.title}>Edit Your Account</Text>
+            <View style={MainScreensStyle.headerContainer}>
+                <TouchableOpacity 
+                    style={MainScreensStyle.backButton}
+                    onPress={() => navigation.navigate('AccountInfo')}
+                >
+                    <Icon 
+                        name="chevron-left"
+                        size="30"
+                    />
+                </TouchableOpacity>
+                <Text style={MainScreensStyle.editAccountTitle}>Edit Profile</Text>
+            </View>
             <View style={MainScreensStyle.profileContainer}>
                 <Avatar onButtonPress={() => setModalVisible(true)} uri={image}/>
                 <Text style={MainScreensStyle.usernameText}>@{username}</Text>

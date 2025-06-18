@@ -19,7 +19,7 @@ const MainScreensStyle = StyleSheet.create ({
     subtitle: {
         fontSize: 20,
         fontWeight: '500',
-        paddingBottom: 15,
+        // paddingBottom: 15,
     },
     text: {
         fontSize: 16,
@@ -57,7 +57,8 @@ const MainScreensStyle = StyleSheet.create ({
         fontSize: 16,
     },
     additionsContainer: {
-        marginTop: 80,
+        position: 'relative',
+        paddingTop: 140,
         
     },
     itemRow: {
@@ -86,7 +87,7 @@ const MainScreensStyle = StyleSheet.create ({
     },
     editButton: {
         fontWeight: '500',
-        fontSize: 15,
+        fontSize: 18,
     },
     accountInfo: {
         borderWidth: 1,
@@ -100,6 +101,27 @@ const MainScreensStyle = StyleSheet.create ({
         fontWeight: '500',
         paddingBottom: 5,
         paddingTop: 20,
+    },
+    headerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+        paddingBottom: 15,
+    },
+    backButton: {
+        paddingBottom: 15,
+        position: 'absolute',
+        left: 0,
+
+    },
+    editAccountTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    ScrollView: {
+        backgroundColor: '#fff',
     },
 });
 

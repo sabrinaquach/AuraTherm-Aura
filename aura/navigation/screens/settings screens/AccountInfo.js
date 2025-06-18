@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import Slider from '@react-native-community/slider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Feather';
 import * as ImagePicker from 'expo-image-picker';
@@ -122,12 +121,18 @@ export default function AccountInfo ({ navigation }) {
     
     return (
         <View style={MainScreensStyle.container}>
-            <Text 
-                style={MainScreensStyle.title}
-                onPress={() => navigation.navigate('Home')}
-            >
-                Aura
-            </Text>
+            <View style={MainScreensStyle.headerContainer}>
+                <TouchableOpacity 
+                    style={MainScreensStyle.backButton}
+                    onPress={() => navigation.navigate('SettingsMain')}
+                >
+                    <Icon 
+                        name="chevron-left"
+                        size="30"
+                    />
+                </TouchableOpacity>
+                <Text style={MainScreensStyle.editAccountTitle}>Profile</Text>
+            </View>
             <View style={MainScreensStyle.profileContainer}>
                 <Avatar onButtonPress={() => setModalVisible(true)} uri={image}/>
                 <Text style={MainScreensStyle.usernameText}>@{username}</Text>

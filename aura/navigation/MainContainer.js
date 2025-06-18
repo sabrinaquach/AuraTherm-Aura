@@ -7,6 +7,7 @@ import HomeScreen from '../navigation/screens/HomeScreen.js';
 import HistoryScreen from '../navigation/screens/HistoryScreen.js';
 import EnergyScreen from '../navigation/screens/EnergyScreen.js';
 import SettingsScreen from '../navigation/screens/SettingsScreen.js';
+import SettingsContainer from './screens/settings screens/SettingsContainer.js';
 
 const homeName = 'Home';
 const historyName = 'History';
@@ -54,8 +55,7 @@ export default function MainContainer() {
                 <Tab.Screen name={homeName} component={HomeScreen} options={{ headerShown: false }}/>
                 <Tab.Screen name={historyName} component={HistoryScreen} options={{ headerShown: false }}/>
                 <Tab.Screen name={energyName} component={EnergyScreen} options={{ headerShown: false }}/>
-                <Tab.Screen name={settingsName} component={SettingsScreen} options={{ headerShown: false }}/>
-
+                <Tab.Screen name={settingsName} component={SettingsContainer} options={{ headerShown: false }} />
             </Tab.Navigator>
         // </NavigationContainer>
     );

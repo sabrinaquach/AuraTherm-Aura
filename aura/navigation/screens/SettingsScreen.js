@@ -157,26 +157,6 @@ export default function SettingsScreen ({ navigation }) {
                 />
                 <Text style={MainScreensStyle.text}>Set how sensitive AuraTherm is to motion—higher levels may change temperature more often.</Text>
             </View>
-            <View style={MainScreensStyle.secondSliderContainer}>
-            <Text style={[MainScreensStyle.subtitle, {paddingBottom: 2}]}>Energy Priority</Text>
-                <View style={MainScreensStyle.labelsContainer}>
-                    {Energylabels.map((label) => (
-                        <Text key={label} style={MainScreensStyle.labelText}>{label}</Text>
-                    ))}
-                </View>
-                <Slider 
-                    style={{width: '100%', height: 40, position: 'fixed'}}
-                    minimumValue={0}
-                    maximumValue={2}
-                    step={1}
-                    value={Energyvalue}
-                    onValueChange={setEnergyValue}
-                    minimumTrackTintColor="#D9D9D9"
-                    maximumTrackTintColor="#D9D9D9"
-                    thumbTintColor="#A3C858C9"
-                />
-                {/* <Text style={MainScreensStyle.text}>Aura adapts to your comfort.</Text> */}
-            </View>
             <View style={MainScreensStyle.additionsContainer}>
                 <View style={MainScreensStyle.separator} />
                 <TouchableOpacity style={MainScreensStyle.itemRow} onPress={() => navigation.navigate('AccountInfo')}>
@@ -188,7 +168,10 @@ export default function SettingsScreen ({ navigation }) {
                     />
                 </TouchableOpacity>
                 <View style={MainScreensStyle.separator} />
-                <TouchableOpacity style={MainScreensStyle.itemRow}>
+                <TouchableOpacity 
+                    style={MainScreensStyle.itemRow} 
+                    onPress={() => navigation.navigate('MainPreferences')}
+                >
                     <Text style={MainScreensStyle.itemText}>Preferences</Text>
                     <Icon 
                         name='chevron-right' 
