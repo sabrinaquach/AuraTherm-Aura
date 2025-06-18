@@ -57,9 +57,9 @@ const MainScreensStyle = StyleSheet.create ({
         fontSize: 16,
     },
     additionsContainer: {
-        position: 'relative',
-        paddingTop: 140,
-        
+        paddingHorizontal: 20,
+        paddingBottom: 20,
+        backgroundColor: '#fff',
     },
     itemRow: {
         flexDirection: 'row',

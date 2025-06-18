@@ -117,35 +117,34 @@ export default function SettingsScreen ({ navigation }) {
     const Energylabels = ['Comfort', 'Eco', 'Balanced'];
     
     return (
+        <View style={{ flex: 1 }}>
         <View style={MainScreensStyle.container}>
-            <Text 
-                style={MainScreensStyle.title}
-                onPress={() => navigation.navigate('Home')}
-            >
-                Aura
-            </Text>
+            <Text style={MainScreensStyle.title}>Settings</Text>
+    
             <View style={MainScreensStyle.profileContainer}>
-                <Avatar onButtonPress={() => setModalVisible(true)} uri={image}/>
+                <Avatar 
+                    onButtonPress={() => setModalVisible(true)} 
+                    uri={image} 
+                />
                 <Text style={MainScreensStyle.usernameText}>@{username}</Text>
                 <UploadModal 
                     modalVisible={modalVisible}
-                    onBackPress={() => {
-                        setModalVisible(false);
-                    }}
+                    onBackPress={() => setModalVisible(false)}
                     onCameraPress={() => uploadImage()}
                     onGalleryPress={() => uploadImage("gallery")}
                     onRemovePress={() => removeImage()}
                 />
             </View>
+      
             <View style={MainScreensStyle.sliderContainer}>
-                <Text style={[MainScreensStyle.subtitle, {paddingBottom: 2}]}>Occupancy Sensitivity</Text>
+                <Text style={[MainScreensStyle.subtitle, {paddingBottom: 2, paddingTop: 10}]}>Occupancy Sensitivity</Text>
                 <View style={MainScreensStyle.labelsContainer}>
                     {Occupancylabels.map((label) => (
                         <Text key={label} style={MainScreensStyle.labelText}>{label}</Text>
                     ))}
                 </View>
                 <Slider 
-                    style={{width: '100%', height: 40, position: 'fixed'}}
+                    style={{width: '100%', height: 40}}
                     minimumValue={0}
                     maximumValue={2}
                     step={0.1}
@@ -157,30 +156,35 @@ export default function SettingsScreen ({ navigation }) {
                 />
                 <Text style={MainScreensStyle.text}>Set how sensitive AuraTherm is to motion—higher levels may change temperature more often.</Text>
             </View>
-            <View style={MainScreensStyle.additionsContainer}>
-                <View style={MainScreensStyle.separator} />
-                <TouchableOpacity style={MainScreensStyle.itemRow} onPress={() => navigation.navigate('AccountInfo')}>
-                    <Text style={MainScreensStyle.itemText}>Account Information</Text>
-                    <Icon 
-                        name='chevron-right' 
-                        size={25} 
-                        style={MainScreensStyle.itemIcon}
-                    />
-                </TouchableOpacity>
-                <View style={MainScreensStyle.separator} />
-                <TouchableOpacity 
-                    style={MainScreensStyle.itemRow} 
-                    onPress={() => navigation.navigate('MainPreferences')}
-                >
-                    <Text style={MainScreensStyle.itemText}>Preferences</Text>
-                    <Icon 
-                        name='chevron-right' 
-                        size={25} 
-                        style={MainScreensStyle.itemIcon}
-                    />
-                </TouchableOpacity>
-                <View style={MainScreensStyle.separator} />
-            </View>
         </View>
-    );
+      
+          <View style={MainScreensStyle.additionsContainer}>
+            <View style={MainScreensStyle.separator}/>
+            <TouchableOpacity 
+                style={MainScreensStyle.itemRow} 
+                onPress={() => navigation.navigate('AccountInfo')}
+            >
+                <Text style={MainScreensStyle.itemText}>Account Information</Text>
+                <Icon 
+                    name="chevron-right" 
+                    size={25} 
+                    style={MainScreensStyle.itemIcon}
+                />
+            </TouchableOpacity>
+            <View style={MainScreensStyle.separator}/>
+            <TouchableOpacity 
+                style={MainScreensStyle.itemRow} 
+                onPress={() => navigation.navigate('MainPreferences')}
+            >
+                <Text style={MainScreensStyle.itemText}>Preferences</Text>
+                <Icon 
+                    name="chevron-right" 
+                    size={25} 
+                    style={MainScreensStyle.itemIcon}
+                />
+            </TouchableOpacity>
+            <View style={MainScreensStyle.separator}/>
+        </View>
+        </View>
+    );      
 }
