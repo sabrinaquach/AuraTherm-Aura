@@ -1,5 +1,5 @@
 import React, {useState } from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Keyboard, Alert } from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, Keyboard, Alert, TouchableWithoutFeedback } from 'react-native';
 import { RadioButton } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -8,28 +8,23 @@ import Input from '../component/input.js'
 import Button from '../component/button.js'
 import Loader from '../component/loader.js'
 import DotProgress from'../component/dotIndicator.js'
+import supabase from '../auth/client.js';
 
 const RegisterAccount = ({ navigation }) => {
     //error handling & validation for input boxes
     const [inputs, setInputs] = useState({
-        username: "",
         email: "",
         password: "",
     });
 
     const [errors, setErrors] = useState({});
-
     const [loading, setLoading] = useState(false);
 
     const validate = () => {
         Keyboard.dismiss();
         let valid = true;
 
-        //username and password validation
-        if(!inputs.username) {
-            handleError('Please input username', 'username');
-            valid = false;
-        } 
+        //password validation
         if(!inputs.password) {
             handleError('Please input password', 'password');
             valid = false;
@@ -56,24 +51,32 @@ const RegisterAccount = ({ navigation }) => {
         }
 
         if(valid) {
-            register();
+            handleSignup();
         }
     };
 
-    const register = () => {
+    //supabase - signup
+    const handleSignup = async () => {
         setLoading(true);
-        setTimeout(() => {
+    
+        setTimeout(async () => {
+            const { error } = await supabase.auth.signUp({
+                email: inputs.email,
+                password: inputs.password,
+            });
+    
             setLoading(false);
-
-            try {
-                AsyncStorage.setItem("user", JSON.stringify(inputs));
-                navigation.navigate('Login');
-            } catch (error) {
-                Alert.alert('Error', 'Something went wrong');
+    
+            if (error) {
+                Alert.alert('Error', error.message);
+            } else {
+                // Alert.alert('Success', 'Check your email to confirm signup.');
+                navigation.navigate("Login");
             }
-        }, 2000);
+        }, 1500);
     };
-
+    
+    
     const handleOnChange = (text, input) => {
         setInputs(prevState => ({...prevState, [input] : text}));
     };
@@ -86,98 +89,91 @@ const RegisterAccount = ({ navigation }) => {
     const [isSelected, setIsSelected] = useState(false);
 
     return (
-        <View style={styles.container}>
-            <Loader visible={loading} label="Creating Your Account..."/>
-            <Text style={onboardingStyle.title}>Create An Account</Text>
-            <View> 
-                <Input
-                    label="Username"
-                    placeholder='Enter your username'
-                    placeholderTextColor='gray'
-                    error={errors.username}
-                    onFocus={() => {
-                        handleError(null, 'username')
-                    }}
-                    onChangeText={text => handleOnChange(text, 'username')}
-                />
-                <Input
-                    label="Email"
-                    placeholder='Enter your email address'
-                    placeholderTextColor='gray'
-                    error={errors.email}
-                    onFocus={() => {
-                        handleError(null, 'email')
-                    }}
-                    onChangeText={text => handleOnChange(text, 'email')}
-
-                />
-                <Input
-                    label="Password"
-                    placeholder='Enter a password that is at least 8 characters'
-                    placeholderTextColor='gray'
-                    error={errors.password}
-                    onFocus={() => {
-                        handleError(null, 'password')
-                    }}
-                    onChangeText={text => handleOnChange(text, 'password')}
-                    password
-                />
-            </View>
-            <View style={onboardingStyle.radioGroup}>
-                <View style={onboardingStyle.radioButton}>
-                    <RadioButton
-                        value={isSelected}
-                        status={isSelected ? 'checked' : 'unchecked'}
-                        onPress={() => {
-                            const nextValue = !isSelected;
-                            setIsSelected(nextValue);
-                            if (nextValue) {
-                              handleError(null, 'terms'); 
-                            }
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.container}>
+                <Loader visible={loading} label="Creating Your Account..."/>
+                <Text style={onboardingStyle.title}>Create An Account</Text>
+                <View> 
+                    <Input
+                        label="Email"
+                        placeholder='Enter your email address'
+                        placeholderTextColor='gray'
+                        keyboardType="email-address"
+                        error={errors.email}
+                        onFocus={() => {
+                            handleError(null, 'email')
                         }}
-                        color="green"
-                        borderWidth="1"
+                        onChangeText={text => handleOnChange(text, 'email')}
+
                     />
-                    <View style={onboardingStyle.learnContainer}>
-                        <Text style={onboardingStyle.radioLabel}>I accept the terms and privacy policy.</Text>
-                        <TouchableOpacity 
+                    <Input
+                        label="Password"
+                        placeholder='Enter a password that is at least 8 characters'
+                        placeholderTextColor='gray'
+                        error={errors.password}
+                        onFocus={() => {
+                            handleError(null, 'password')
+                        }}
+                        onChangeText={text => handleOnChange(text, 'password')}
+                        password
+                    />
+                </View>
+                <View style={onboardingStyle.radioGroup}>
+                    <View style={onboardingStyle.radioButton}>
+                        <RadioButton
+                            value={isSelected}
+                            status={isSelected ? 'checked' : 'unchecked'}
                             onPress={() => {
-                                navigation.navigate('Terms', 
-                                {
-                                    onAgree: () => {
-                                        setIsSelected(true);
-                                        handleError(null, 'terms');
-                                    },
-                                    onReject: () => setIsSelected(false),
-                                })
+                                const nextValue = !isSelected;
+                                setIsSelected(nextValue);
+                                if (nextValue) {
+                                handleError(null, 'terms'); 
+                                }
                             }}
-                        >
-                        <Text style={onboardingStyle.linkText}>Learn More</Text>
-                        </TouchableOpacity>
+                            color="green"
+                            borderWidth="1"
+                        />
+                        <View style={onboardingStyle.learnContainer}>
+                            <Text style={onboardingStyle.radioLabel}>I accept the terms and privacy policy.</Text>
+                            <TouchableOpacity 
+                                onPress={() => {
+                                    navigation.navigate('Terms', 
+                                    {
+                                        onAgree: () => {
+                                            setIsSelected(true);
+                                            handleError(null, 'terms');
+                                        },
+                                        onReject: () => setIsSelected(false),
+                                    })
+                                }}
+                            >
+                            <Text style={onboardingStyle.linkText}>Learn More</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
-            </View>
-            {errors.terms && (
-                <Text style={onboardingStyle.termsError}>{errors.terms}</Text>
-            )}
-            <View style={onboardingStyle.dotIndicator}>
-                <DotProgress 
-                    total={5} current={1}
-                    title="Set Up Your Account"
+                {errors.terms && (
+                    <Text style={onboardingStyle.termsError}>{errors.terms}</Text>
+                )}
+                <View style={onboardingStyle.dotIndicator}>
+                    <DotProgress 
+                        total={5} current={1}
+                        title="Set Up Your Account"
+                    />
+                </View>
+                <Button 
+                    backgroundColor="#A3C858C9"
+                    title="Register" 
+                    onPress={validate}
                 />
+                <Text 
+                    style={onboardingStyle.loginDescription}
+                    onPress={() => navigation.navigate('Login')}
+                >
+                    Already have an account? Login
+                </Text>
             </View>
-            <Button 
-                backgroundColor="#A3C858C9"
-                title="Register" 
-                onPress={validate}
-            />
-            <Text 
-                style={onboardingStyle.loginDescription}
-                onPress={() => navigation.navigate('Login')}
-            >
-                Already have an account? Login
-            </Text>
-        </View>
+        </TouchableWithoutFeedback>
     )
 }
 export default RegisterAccount;
@@ -189,11 +185,4 @@ const styles = StyleSheet.create ({
         paddingHorizontal: 20, 
         backgroundColor: '#fff',
     },
-    // dotIndicator: {
-    //     top: 610,
-    //     position: 'absolute',
-    //     bottom: 0,
-    //     left: 20,
-    //     right: 0,
-    // },
 });

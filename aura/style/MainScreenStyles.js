@@ -78,6 +78,7 @@ const MainScreensStyle = StyleSheet.create ({
     },
     itemIcon: {
         marginLeft: 'auto',
+        color: 'gray',
     },
     accountSection: {
         paddingTop: 10,
