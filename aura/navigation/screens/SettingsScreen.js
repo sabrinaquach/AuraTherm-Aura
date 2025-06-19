@@ -68,48 +68,48 @@ export default function SettingsScreen ({ navigation }) {
     //profile - remove image
     const removeImage = async () => {
         try {
-          if (image) {
-            // Get the filename from the image URI
-            const fileName = image.split('/').pop();
+            if (image) {
+                //get the filename from the image URI
+                const fileName = image.split('/').pop();
       
-            const { error } = await supabase
-              .storage
-              .from('profile-image') 
-              .remove([fileName]);
+                const { error } = await supabase
+                .storage
+                .from('profile-image') 
+                .remove([fileName]);
       
-            if (error) {
-              throw error;
+                if (error) {
+                    throw error;
+                }
+      
+                setImage(null);
+                setModalVisible(false);
+                console.log('Image removed from Supabase');
+            } else {
+                setImage(null);
+                setModalVisible(false);
             }
-      
-            setImage(null);
-            setModalVisible(false);
-            console.log('Image removed from Supabase');
-          } else {
-            setImage(null);
-            setModalVisible(false);
-          }
         } catch (error) {
-          alert("Error removing image: " + error.message);
-          setModalVisible(false);
+            alert("Error removing image: " + error.message);
+            setModalVisible(false);
         }
-      };
+    };
       
 
     //check if user has account before uploading image
     useEffect(() => {
         const checkAuth = async () => {
-          const { data, error } = await supabase.auth.getSession();
-          if (error) {
-            console.error('Error getting session:', error);
-          } else if (!data.session) {
-            console.log('No user session found. User is not authenticated.');
-          } else {
-            console.log('User is authenticated:', data.session.user);
-          }
+            const { data, error } = await supabase.auth.getSession();
+            if (error) {
+                console.error('Error getting session:', error);
+            } else if (!data.session) {
+                console.log('No user session found. User is not authenticated.');
+            } else {
+                console.log('User is authenticated:', data.session.user);
+            }
         };
       
         checkAuth();
-      }, []);
+    }, []);
 
     const uploadToSupabase = async (uri) => {
         const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
@@ -125,11 +125,11 @@ export default function SettingsScreen ({ navigation }) {
         const buffer = Buffer.from(base64, 'base64');
       
         const { data, error } = await supabase.storage
-          .from('profile-image')
-          .upload(fileName, buffer, {
-            contentType: fileType,
-            upsert: true,
-          });
+            .from('profile-image')
+            .upload(fileName, buffer, {
+                contentType: fileType,
+                upsert: true,
+            });
       
         if (error) throw error;
       
