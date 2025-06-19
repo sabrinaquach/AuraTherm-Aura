@@ -9,25 +9,25 @@ import MainScreensStyle from '../../style/MainScreenStyles';
 import Avatar from '../../component/profile/avatar';
 import UploadModal from '../../component/profile/UploadModal';
 import Loader from '../../component/loader'
-import supabase from '../../auth/client.js'
+import supabase from '../../auth/client';
 
 export default function SettingsScreen ({ navigation }) {
     const [modalVisible, setModalVisible] = useState(false);
     // const FormData = global.FormData;
 
-    //profile - display set username
+    //profile - display email
     const [email, setEmail] = useState('');
 
-    useEffect (() => {
-        const loadUserData = async () => {
-            const findUser = await AsyncStorage.getItem('user');
-            if (findUser) {
-                const user = JSON.parse(findUser);
-                setUsername(user.email);
-            }
-        };
-        loadUserData();
-    }, []);
+    // useEffect (() => {
+    //     const loadUserData = async () => {
+    //         const findUser = await AsyncStorage.getItem('email');
+    //         if (findUser) {
+    //             const user = JSON.parse(findUser);
+    //             setEmail(user.email);
+    //         }
+    //     };
+    //     loadUserData();
+    // }, []);
 
     //profile - upload image
     const [image, setImage] = useState();
@@ -158,7 +158,7 @@ export default function SettingsScreen ({ navigation }) {
                 </View>
         
                 <View style={MainScreensStyle.sliderContainer}>
-                    <Text style={[MainScreensStyle.subtitle, {paddingBottom: 2, paddingTop: 10}]}>Occupancy Sensitivity</Text>
+                    <Text style={[MainScreensStyle.subtitle, {paddingBottom: 2}]}>Occupancy Sensitivity</Text>
                     <View style={MainScreensStyle.labelsContainer}>
                         {Occupancylabels.map((label) => (
                             <Text key={label} style={MainScreensStyle.labelText}>{label}</Text>

@@ -64,7 +64,7 @@ const RegisterAccount = ({ navigation }) => {
                 email: inputs.email,
                 password: inputs.password,
             });
-    
+
             setLoading(false);
     
             if (error) {
