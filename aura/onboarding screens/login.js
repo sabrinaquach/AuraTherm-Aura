@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {View, Text, Keyboard, Alert, StyleSheet } from 'react-native';
+import {View, Text, Keyboard, Alert, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import onboardingStyle from '../style/onboardingStyle.js';
@@ -7,10 +7,10 @@ import Input from '../component/input.js'
 import Button from '../component/button.js'
 import Loader from '../component/loader.js'
 import DotProgress from'../component/dotIndicator.js'
+import supabase from '../auth/client.js';
 
 const Login = ({ navigation }) => {
     const [inputs, setInputs] = useState({
-        username: "",
         email: "",
         password: "",
     });
@@ -24,7 +24,7 @@ const Login = ({ navigation }) => {
         let valid = true;
 
         //email/username and password validation
-        if(!inputs.usernameOremail) {
+        if(!inputs.email) {
             handleError('Please enter your username or email', 'usernameOremail');
             valid = false;
         } 
@@ -34,35 +34,57 @@ const Login = ({ navigation }) => {
         } 
 
         if(valid) {
-            login();
+            handleLogin();
         }
     };
 
-    const login = () => {
+    // const login = () => {
+    //     setLoading(true);
+    //     setTimeout(async() => {
+    //         setLoading(false);
+    //         let userData = await AsyncStorage.getItem('user');
+    //         if (userData) {
+    //             userData = JSON.parse(userData);
+    //             if (
+    //                 (inputs.usernameOremail === userData.username || 
+    //                     inputs.usernameOremail === userData.email) && 
+    //                 inputs.password == userData.password
+    //             ) {
+    //                 AsyncStorage.setItem(
+    //                     'user', 
+    //                     JSON.stringify({...userData, loggedIn : true}),
+    //             );
+    //             navigation.navigate("Preferences");
+    //             } else {
+    //                 Alert.alert('Error', 'Invalid details');
+    //             }
+    //         } else {
+    //             Alert.alert('Error', 'User does not exist');
+    //         }
+    //     }, 2000);
+    // };
+
+    // supabase - login
+    const handleLogin = async () => {
         setLoading(true);
-        setTimeout(async() => {
+    
+        setTimeout(async () => {
+            const { error } = await supabase.auth.signInWithPassword({
+                email: inputs.email,
+                password: inputs.password,
+            });
+    
             setLoading(false);
-            let userData = await AsyncStorage.getItem('user');
-            if (userData) {
-                userData = JSON.parse(userData);
-                if (
-                    (inputs.usernameOremail === userData.username || 
-                        inputs.usernameOremail === userData.email) && 
-                    inputs.password == userData.password
-                ) {
-                    AsyncStorage.setItem(
-                        'user', 
-                        JSON.stringify({...userData, loggedIn : true}),
-                );
-                navigation.navigate("Preferences");
-                } else {
-                    Alert.alert('Error', 'Invalid details');
-                }
+    
+            if (error) {
+                Alert.alert('Error', error.message);
             } else {
-                Alert.alert('Error', 'User does not exist');
+                navigation.navigate("Preferences");
             }
         }, 2000);
     };
+    
+      
 
     const handleOnChange = (text, input) => {
         setInputs(prevState => ({...prevState, [input] : text}));
@@ -73,51 +95,54 @@ const Login = ({ navigation }) => {
     };
 
     return (
-        <View style={styles.container}>
-            <Loader visible={loading} label="Logging Into Your Account..."/>
-            <Text style={onboardingStyle.title}>Login</Text>
-            <View> 
-                <Input
-                    label="Username"
-                    placeholder='Enter your username or email'
-                    placeholderTextColor='gray'
-                    error={errors.usernameOremail}
-                    onFocus={() => {
-                        handleError(null, 'usernameOremail')
-                    }}
-                    onChangeText={text => handleOnChange(text, 'usernameOremail')}
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.container}>
+                <Loader visible={loading} label="Logging Into Your Account..."/>
+                <Text style={onboardingStyle.title}>Login</Text>
+                <View> 
+                    <Input
+                        label="Email"
+                        placeholder='Enter your email'
+                        placeholderTextColor='gray'
+                        keyboardType="email-address"
+                        error={errors.email}
+                        onFocus={() => {
+                            handleError(null, 'email')
+                        }}
+                        onChangeText={text => handleOnChange(text, 'email')}
+                    />
+                    <Input
+                        label="Password"
+                        placeholder='Enter a password that is at least 8 characters'
+                        placeholderTextColor='gray'
+                        error={errors.password}
+                        onFocus={() => {
+                            handleError(null, 'password')
+                        }}
+                        onChangeText={text => handleOnChange(text, 'password')}
+                        password
+                    />
+                </View>
+                <View style={onboardingStyle.dotIndicator}>
+                    <DotProgress 
+                        total={5} current={1}
+                        title="Login to Your Account"
+                    />
+                </View>
+                <Button 
+                    backgroundColor="#A3C858C9"
+                    title="Login" 
+                    // onPress={() => navigation.navigate('NetworkPairing')}
+                    onPress={validate}
                 />
-                <Input
-                    label="Password"
-                    placeholder='Enter a password that is at least 8 characters'
-                    placeholderTextColor='gray'
-                    error={errors.password}
-                    onFocus={() => {
-                        handleError(null, 'password')
-                    }}
-                    onChangeText={text => handleOnChange(text, 'password')}
-                    password
-                />
+                <Text 
+                    style={onboardingStyle.registerDescription}
+                    onPress={() => navigation.navigate('RegisterAccount')}
+                >
+                    Don't have an account? Register
+                </Text>
             </View>
-            <View style={onboardingStyle.dotIndicator}>
-                <DotProgress 
-                    total={5} current={1}
-                    title="Login to Your Account"
-                />
-            </View>
-            <Button 
-                backgroundColor="#A3C858C9"
-                title="Login" 
-                // onPress={() => navigation.navigate('NetworkPairing')}
-                onPress={validate}
-            />
-            <Text 
-                style={onboardingStyle.registerDescription}
-                onPress={() => navigation.navigate('RegisterAccount')}
-            >
-                Don't have an account? Register
-            </Text>
-        </View>
+        </TouchableWithoutFeedback>
     )
 }
 
@@ -130,11 +155,4 @@ const styles = StyleSheet.create ({
         paddingHorizontal: 20, 
         backgroundColor: '#fff',
     },
-    // dotIndicator: {
-    //     top: 615,
-    //     position: 'absolute',
-    //     bottom: 0,
-    //     left: 20,
-    //     right: 0,
-    // },
 });
