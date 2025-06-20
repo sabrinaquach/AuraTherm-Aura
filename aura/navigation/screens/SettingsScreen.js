@@ -102,7 +102,7 @@ export default function SettingsScreen ({ navigation }) {
             if (error) {
                 console.error('Error getting session:', error);
             } else if (!data.session) {
-                console.log('No user session found. User is not authenticated.');
+                console.log('User is not authenticated.');
             } else {
                 console.log('User is authenticated:', data.session.user);
             }
