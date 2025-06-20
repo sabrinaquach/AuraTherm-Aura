@@ -71,7 +71,7 @@ const RegisterAccount = ({ navigation }) => {
                 Alert.alert('Error', error.message);
             } else {
                 // Alert.alert('Success', 'Check your email to confirm signup.');
-                navigation.navigate("Login");
+                navigation.navigate("Welcome");
             }
         }, 1500);
     };

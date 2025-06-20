@@ -6,7 +6,7 @@ import onboardingStyle from '../style/onboardingStyle.js';
 import Input from '../component/input.js'
 import Button from '../component/button.js'
 import Loader from '../component/loader.js'
-import DotProgress from'../component/dotIndicator.js'
+// import DotProgress from'../component/dotIndicator.js'
 import supabase from '../auth/client.js';
 
 const Login = ({ navigation }) => {
@@ -79,13 +79,16 @@ const Login = ({ navigation }) => {
             if (error) {
                 Alert.alert('Error', error.message);
             } else {
-                navigation.navigate("Preferences");
+                const onboardingComplete = await AsyncStorage.getItem('onboardingComplete');
+                if (onboardingComplete === 'true') {
+                    navigation.replace('MainScreens');
+                } else {
+                    navigation.replace('Welcome');
+                }
             }
         }, 2000);
     };
     
-      
-
     const handleOnChange = (text, input) => {
         setInputs(prevState => ({...prevState, [input] : text}));
     };
@@ -123,12 +126,12 @@ const Login = ({ navigation }) => {
                         password
                     />
                 </View>
-                <View style={onboardingStyle.dotIndicator}>
+                {/* <View style={onboardingStyle.dotIndicator}>
                     <DotProgress 
                         total={5} current={1}
                         title="Login to Your Account"
                     />
-                </View>
+                </View> */}
                 <Button 
                     backgroundColor="#A3C858C9"
                     title="Login" 

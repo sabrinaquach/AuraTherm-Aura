@@ -87,11 +87,38 @@ const EditAccountInfo = ({ navigation }) => {
         };
 
     //error handling & validation for input boxes
-    const [inputs, setInputs] = useState({
-        username: "",
-        email: "",
-        password: "",
-    });
+    //check if user has account before uploading image
+    useEffect(() => {
+        const checkAuth = async () => {
+            const { data, error } = await supabase.auth.getSession();
+            if (error) {
+                console.error('Error getting session:', error);
+            } else if (!data.session) {
+                console.log('User is not authenticated.');
+            } else {
+                console.log('User is authenticated:', data.session.user);
+            }
+        };
+      
+        checkAuth();
+    }, []);
+
+    // const {inputs: currentInputs} = checkAuth();
+    // const [inputs, setInputs] = useState({
+    //     username: "",
+    //     email: "",
+    //     password: "",
+    // });
+
+    // useEffect(() => {
+    //     if(currentInputs) {
+    //         setUser({
+    //             email: currentUser.email || "",
+    //             password: currentUser.password || "",
+    //             image: currentUser.image || null,
+    //         })
+    //     }
+    // }, []);
 
     const [errors, setErrors] = useState({});
 

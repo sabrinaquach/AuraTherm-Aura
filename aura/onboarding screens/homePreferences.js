@@ -88,7 +88,7 @@ const Preferences = ({ navigation }) => {
             </View>
             <View style={onboardingStyle.dotIndicator}>
                 <DotProgress 
-                    total={5} current={2}
+                    total={4} current={1}
                     title="Preferences"
                 />
             </View>

@@ -1,11 +1,18 @@
 import React from 'react';
 import {View, Text, Image, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import onboardingStyle from '../style/onboardingStyle.js';
 import Button from '../component/button.js'
 import DotProgress from'../component/dotIndicator.js'
 
 const Final = ({ navigation, onFinish }) => {
+    const completeOnboarding = async () => {
+        await AsyncStorage.setItem('onboardingComplete', 'true');
+        navigation.replace('MainScreens');
+
+      };
+
     return (
         <View style={styles.container}>
             <Text style={onboardingStyle.title}>You’re All Set!</Text>
@@ -16,14 +23,14 @@ const Final = ({ navigation, onFinish }) => {
             />
             <View style={onboardingStyle.dotIndicator}>
                 <DotProgress 
-                    total={5} current={4}
+                    total={4} current={3}
                     title="Great, you're done!"
                 />
             </View>
             <Button 
                 backgroundColor="#A3C858C9"
                 title="Go To Home"
-                onPress={() => navigation.navigate('MainScreens')}
+                onPress={completeOnboarding}
             />
         </View>
     )

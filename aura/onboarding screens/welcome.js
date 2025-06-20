@@ -17,14 +17,14 @@ const Welcome = ({ navigation }) => {
             <Text style={onboardingStyle.text}>Aura's mission aims to promote environmental sustainability and reduced utility costs.</Text>
             <View style={onboardingStyle.dotIndicator}>
                 <DotProgress 
-                    total={5} current={0}
+                    total={4} current={0}
                     title="Welcome"
                 />
             </View>
             <Button 
                 backgroundColor="#A3C858C9"
                 title="Get Started"
-                onPress={() => navigation.navigate('RegisterAccount')}
+                onPress={() => navigation.navigate('Preferences')}
             />
         </View>
     )

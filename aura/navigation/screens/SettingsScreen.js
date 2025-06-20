@@ -96,20 +96,20 @@ export default function SettingsScreen ({ navigation }) {
       
 
     //check if user has account before uploading image
-    useEffect(() => {
-        const checkAuth = async () => {
-            const { data, error } = await supabase.auth.getSession();
-            if (error) {
-                console.error('Error getting session:', error);
-            } else if (!data.session) {
-                console.log('User is not authenticated.');
-            } else {
-                console.log('User is authenticated:', data.session.user);
-            }
-        };
+    // useEffect(() => {
+    //     const checkAuth = async () => {
+    //         const { data, error } = await supabase.auth.getSession();
+    //         if (error) {
+    //             console.error('Error getting session:', error);
+    //         } else if (!data.session) {
+    //             console.log('User is not authenticated.');
+    //         } else {
+    //             console.log('User is authenticated:', data.session.user);
+    //         }
+    //     };
       
-        checkAuth();
-    }, []);
+    //     checkAuth();
+    // }, []);
 
     const uploadToSupabase = async (uri) => {
         const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
