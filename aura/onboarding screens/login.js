@@ -6,65 +6,13 @@ import onboardingStyle from '../style/onboardingStyle.js';
 import Input from '../component/input.js'
 import Button from '../component/button.js'
 import Loader from '../component/loader.js'
-// import DotProgress from'../component/dotIndicator.js'
 import supabase from '../auth/client.js';
+import useLoginValidation from '../utilties/useLoginValidation.js';
 
 const Login = ({ navigation }) => {
-    const [inputs, setInputs] = useState({
-        email: "",
-        password: "",
-    });
-
-    const [errors, setErrors] = useState({});
-
-    const [loading, setLoading] = useState(false);
-
-    const validate = () => {
-        Keyboard.dismiss();
-        let valid = true;
-
-        //email/username and password validation
-        if(!inputs.email) {
-            handleError('Please enter your username or email', 'usernameOremail');
-            valid = false;
-        } 
-        if(!inputs.password) {
-            handleError('Please input password', 'password');
-            valid = false;
-        } 
-
-        if(valid) {
-            handleLogin();
-        }
-    };
-
-    // const login = () => {
-    //     setLoading(true);
-    //     setTimeout(async() => {
-    //         setLoading(false);
-    //         let userData = await AsyncStorage.getItem('user');
-    //         if (userData) {
-    //             userData = JSON.parse(userData);
-    //             if (
-    //                 (inputs.usernameOremail === userData.username || 
-    //                     inputs.usernameOremail === userData.email) && 
-    //                 inputs.password == userData.password
-    //             ) {
-    //                 AsyncStorage.setItem(
-    //                     'user', 
-    //                     JSON.stringify({...userData, loggedIn : true}),
-    //             );
-    //             navigation.navigate("Preferences");
-    //             } else {
-    //                 Alert.alert('Error', 'Invalid details');
-    //             }
-    //         } else {
-    //             Alert.alert('Error', 'User does not exist');
-    //         }
-    //     }, 2000);
-    // };
-
     // supabase - login
+    const [loading, setLoading] = useState(false);
+    
     const handleLogin = async () => {
         setLoading(true);
     
@@ -88,14 +36,15 @@ const Login = ({ navigation }) => {
             }
         }, 2000);
     };
-    
-    const handleOnChange = (text, input) => {
-        setInputs(prevState => ({...prevState, [input] : text}));
-    };
 
-    const handleError = (errorMessage, input) => {
-        setErrors((prevState) => ({...prevState, [input] : errorMessage}));
-    };
+    //call LoginValidation.js - ensure user enters inputs
+    const {
+        inputs,
+        errors,
+        handleOnChange,
+        handleError,
+        validate,
+      } = useLoginValidation(handleLogin);
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -129,7 +78,6 @@ const Login = ({ navigation }) => {
                 <Button 
                     backgroundColor="#A3C858C9"
                     title="Login" 
-                    // onPress={() => navigation.navigate('NetworkPairing')}
                     onPress={validate}
                 />
                 <Text 

@@ -1,39 +1,38 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import Slider from '@react-native-community/slider';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Feather';
 import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system';
-import mime from 'mime'; 
-import { Buffer } from 'buffer';
-global.Buffer = Buffer;
 
 import MainScreensStyle from '../../style/MainScreenStyles';
 import Avatar from '../../component/profile/avatar';
 import UploadModal from '../../component/profile/UploadModal';
-import Loader from '../../component/loader'
+import Loader from '../../component/loader';
 import supabase from '../../auth/client';
+import useAvatar from '../../utilties/useAvatar';
 
 export default function SettingsScreen ({ navigation }) {
     const [modalVisible, setModalVisible] = useState(false);
 
-    //profile - display email
-    const [email, setEmail] = useState('');
+    //profile - display username
+    const [username, setUsername] = useState('');
 
-    // useEffect (() => {
-    //     const loadUserData = async () => {
-    //         const findUser = await AsyncStorage.getItem('email');
-    //         if (findUser) {
-    //             const user = JSON.parse(findUser);
-    //             setEmail(user.email);
-    //         }
-    //     };
-    //     loadUserData();
-    // }, []);
+    useEffect (() => {
+        const loadUserData = async () => {
+            const { data } = await supabase.auth.getSession();
+            const user = data?.session?.user;
+            const username = user?.user_metadata?.username;
 
-    //profile - upload image
-    const [image, setImage] = useState();
+            if (username) {
+                setUsername(username);
+            }
+        };
+        loadUserData();
+    }, []);
+
+    //call useAvatar.js - load user data for pfp
+    const { image, setImage, saveImage, removeImage } = useAvatar();
+    
     const uploadImage = async (mode) => {
         try {
             let result = {};
@@ -64,122 +63,6 @@ export default function SettingsScreen ({ navigation }) {
             setModalVisible(false);
         }
     };
-
-    //profile - remove image
-    const removeImage = async () => {
-        try {
-            if (image) {
-                //get the filename from the image URI
-                const fileName = image.split('/').pop();
-      
-                const { error } = await supabase
-                .storage
-                .from('profile-image') 
-                .remove([fileName]);
-      
-                if (error) {
-                    throw error;
-                }
-      
-                setImage(null);
-                setModalVisible(false);
-                console.log('Image removed from Supabase');
-            } else {
-                setImage(null);
-                setModalVisible(false);
-            }
-        } catch (error) {
-            alert("Error removing image: " + error.message);
-            setModalVisible(false);
-        }
-    };
-      
-
-    //check if user has account before uploading image
-    // useEffect(() => {
-    //     const checkAuth = async () => {
-    //         const { data, error } = await supabase.auth.getSession();
-    //         if (error) {
-    //             console.error('Error getting session:', error);
-    //         } else if (!data.session) {
-    //             console.log('User is not authenticated.');
-    //         } else {
-    //             console.log('User is authenticated:', data.session.user);
-    //         }
-    //     };
-      
-    //     checkAuth();
-    // }, []);
-
-    const uploadToSupabase = async (uri) => {
-        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-        if (!sessionData.session) {
-            alert("You must be logged in to upload images.");
-            return;
-        }
-
-        const fileExt = uri.split('.').pop();
-        const fileName = `${Date.now()}.${fileExt}`;
-        const fileType = mime.getType(uri) || 'image/png';
-        const base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
-        const buffer = Buffer.from(base64, 'base64');
-      
-        const { data, error } = await supabase.storage
-            .from('profile-image')
-            .upload(fileName, buffer, {
-                contentType: fileType,
-                upsert: true,
-            });
-      
-        if (error) throw error;
-      
-        return data;
-      };
-
-    const saveImage = async (imageUri) => {
-        try {
-            setImage(imageUri);
-            setModalVisible(false);
-      
-            const result = await uploadToSupabase(imageUri);
-            console.log('Image uploaded to Supabase:', result);
-
-            await supabase.auth.updateUser({
-                data: { avatar: result.path }
-            });
-          
-        } catch (error) {
-            console.error("Error saving/uploading image:", error);
-            alert("Upload failed: " + error.message);
-        }
-    };
-
-    useEffect(() => {
-        const loadUserImage = async () => {
-            const {
-                data: { session },
-            } = await supabase.auth.getSession();
-      
-            const user = session?.user;
-            const avatarPath = user?.user_metadata?.avatar;
-        
-            console.log("Avatar path from metadata:", avatarPath); 
-      
-            if (avatarPath) {
-                const { data, error } = await supabase.storage
-                .from('profile-image')
-                    .createSignedUrl(avatarPath, 60 * 60);
-
-                if (error) {
-                    console.error("Error creating signed URL:", error.message);
-                } else {
-                    setImage(data.signedUrl);
-                }
-            }
-        };
-      
-        loadUserImage();
-    }, []);
       
     //supabase - log out
     const [loading, setLoading] = useState(false);
@@ -215,7 +98,7 @@ export default function SettingsScreen ({ navigation }) {
                         onButtonPress={() => setModalVisible(true)} 
                         uri={image} 
                     />
-                    <Text style={MainScreensStyle.usernameText}>{email}</Text>
+                    <Text style={MainScreensStyle.usernameText}>{username}</Text>
                     <UploadModal 
                         modalVisible={modalVisible}
                         onBackPress={() => setModalVisible(false)}

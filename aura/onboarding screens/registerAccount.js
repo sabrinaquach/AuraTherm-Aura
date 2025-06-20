@@ -1,61 +1,18 @@
 import React, {useState } from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, Keyboard, Alert, TouchableWithoutFeedback } from 'react-native';
 import { RadioButton } from 'react-native-paper';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import onboardingStyle from '../style/onboardingStyle.js';
 import Input from '../component/input.js'
 import Button from '../component/button.js'
 import Loader from '../component/loader.js'
-import DotProgress from'../component/dotIndicator.js'
 import supabase from '../auth/client.js';
+import useValidation from '../utilties/useSignupValidation.js';
 
 const RegisterAccount = ({ navigation }) => {
-    //error handling & validation for input boxes
-    const [inputs, setInputs] = useState({
-        email: "",
-        password: "",
-    });
-
-    const [errors, setErrors] = useState({});
+    //supabase - signup
     const [loading, setLoading] = useState(false);
 
-    const validate = () => {
-        Keyboard.dismiss();
-        let valid = true;
-
-        //password validation
-        if(!inputs.password) {
-            handleError('Please input password', 'password');
-            valid = false;
-        } else if(inputs.password.length < 8) {
-            handleError('Minimum password length of 8 characters', 'password');
-            valid = false;
-        }
-
-        //email validation
-        if(!inputs.email) {
-            handleError('Please input email', 'email');
-            valid = false;
-        } else if (!inputs.email.match(/\S+@\S+\.\S+/)) {
-            handleError('Please input valid email', 'email');
-            valid = false;
-        }
-
-        //terms validation
-        if(!isSelected) {
-            handleError('Please accept the terms', 'terms');
-            valid = false;
-        } else {
-            handleError(null, 'terms');
-        }
-
-        if(valid) {
-            handleSignup();
-        }
-    };
-
-    //supabase - signup
     const handleSignup = async () => {
         setLoading(true);
     
@@ -63,6 +20,11 @@ const RegisterAccount = ({ navigation }) => {
             const { error } = await supabase.auth.signUp({
                 email: inputs.email,
                 password: inputs.password,
+                options: {
+                    data: {
+                      username: inputs.username,
+                    },
+                  },
             });
 
             setLoading(false);
@@ -75,25 +37,35 @@ const RegisterAccount = ({ navigation }) => {
             }
         }, 1500);
     };
-    
-    
-    const handleOnChange = (text, input) => {
-        setInputs(prevState => ({...prevState, [input] : text}));
-    };
 
-    const handleError = (errorMessage, input) => {
-        setErrors((prevState) => ({...prevState, [input] : errorMessage}));
-    };
-
-    //terms and condition radio button
-    const [isSelected, setIsSelected] = useState(false);
+    //call validation.js - ensure user enters inputs
+    const {
+        inputs,
+        errors,
+        isSelected,
+        setIsSelected,
+        handleOnChange,
+        handleError,
+        validate,
+    } = useValidation(handleSignup);
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.container}>
                 <Loader visible={loading} label="Creating Your Account..."/>
                 <Text style={onboardingStyle.title}>Create An Account</Text>
-                <View> 
+                <View>
+                    <Input
+                        label="Username"
+                        placeholder='Enter your username'
+                        placeholderTextColor='gray'
+                        error={errors.username}
+                        onFocus={() => {
+                            handleError(null, 'username')
+                        }}
+                        onChangeText={text => handleOnChange(text, 'username')}
+
+                    /> 
                     <Input
                         label="Email"
                         placeholder='Enter your email address'
