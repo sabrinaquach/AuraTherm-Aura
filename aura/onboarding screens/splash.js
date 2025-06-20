@@ -8,20 +8,20 @@ import supabase from '../auth/client';
 const Splash = ({ navigation }) => {
   useEffect(() => {
     const checkStatus = async () => {
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Splash delay
+      await new Promise(resolve => setTimeout(resolve, 2000)); 
 
       const { data: { session } } = await supabase.auth.getSession();
       const onboardingComplete = await AsyncStorage.getItem('onboardingComplete');
 
       if (session) {
-        // User is logged in
+        //user is logged in
         if (onboardingComplete === 'true') {
           navigation.replace('MainScreens');
         } else {
           navigation.replace('Welcome');
         }
       } else {
-        // User not logged in
+        //user not logged in
         navigation.replace('Login');
       }
     };

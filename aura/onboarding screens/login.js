@@ -126,12 +126,6 @@ const Login = ({ navigation }) => {
                         password
                     />
                 </View>
-                {/* <View style={onboardingStyle.dotIndicator}>
-                    <DotProgress 
-                        total={5} current={1}
-                        title="Login to Your Account"
-                    />
-                </View> */}
                 <Button 
                     backgroundColor="#A3C858C9"
                     title="Login" 

@@ -10,7 +10,6 @@ const Final = ({ navigation, onFinish }) => {
     const completeOnboarding = async () => {
         await AsyncStorage.setItem('onboardingComplete', 'true');
         navigation.replace('MainScreens');
-
       };
 
     return (

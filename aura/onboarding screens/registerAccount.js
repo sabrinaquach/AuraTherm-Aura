@@ -155,12 +155,6 @@ const RegisterAccount = ({ navigation }) => {
                 {errors.terms && (
                     <Text style={onboardingStyle.termsError}>{errors.terms}</Text>
                 )}
-                <View style={onboardingStyle.dotIndicator}>
-                    <DotProgress 
-                        total={5} current={1}
-                        title="Set Up Your Account"
-                    />
-                </View>
                 <Button 
                     backgroundColor="#A3C858C9"
                     title="Register" 

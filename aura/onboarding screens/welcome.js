@@ -41,11 +41,4 @@ container: {
     paddingHorizontal: 20, 
     backgroundColor: '#fff',
 },
-// dotIndicator: {          
-//     top: 610,
-//     position: 'absolute',
-//     bottom: 0,
-//     left: 20,
-//     right: 0,
-// },
 });
