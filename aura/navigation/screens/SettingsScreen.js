@@ -12,8 +12,6 @@ import supabase from '../../auth/client';
 import useAvatar from '../../utilties/useAvatar';
 
 export default function SettingsScreen ({ navigation }) {
-    const [modalVisible, setModalVisible] = useState(false);
-
     //profile - display username
     const [username, setUsername] = useState('');
 
@@ -32,6 +30,9 @@ export default function SettingsScreen ({ navigation }) {
 
     //call useAvatar.js - load user data for pfp
     const { image, setImage, saveImage, removeImage } = useAvatar();
+    
+    //use modal
+    const [modalVisible, setModalVisible] = useState(false);
     
     const uploadImage = async (mode) => {
         try {
