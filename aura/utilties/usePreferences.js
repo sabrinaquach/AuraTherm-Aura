@@ -41,6 +41,7 @@ export default function usePreferences( ) {
             if (data) {
                 setTempUnit(data.tempUnit || '');
                 setTempRange(data.TempRange || '');
+                setTempPreferences(data.tempRange || '');
                 setOccupancySensitivity(data.ccupancySensitivity || '');
                 setEnergyPriority(data.EnergyPriority || '');
             }
@@ -54,38 +55,36 @@ export default function usePreferences( ) {
     }
     
     async function updatePreferences({ tempUnit, tempRange, occupancySensitivity, energyPriority }) {
-        try {
-            setLoading(true);
-            const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-            const session = sessionData?.session;
-    
-            if (!session.user) throw new Error('No user on the session');
-    
-            const updates = {
-                id: session.user.id,
-                tempUnit,
-                tempRange,
-                occupancySensitivity,
-                energyPriority,
-                updated_at: new Date(),
-            };
-    
-            const { error } = await supabase
-                .from('user-preferences')
-                .upsert(updates, { onConflict: ['id'] });
-    
-            if (error) throw error;
-    
-        } catch (error) {
-            if (error) Alert.alert(error.message);
-        } finally {
-            setLoading(false);
-        }
+    try {
+        setLoading(true);
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        const session = sessionData?.session;
+
+        if (!session.user) throw new Error('No user on the session');
+
+        const updates = {
+            id: session.user.id,
+            tempUnit,
+            tempRange,
+            occupancySensitivity,
+            energyPriority,
+            updated_at: new Date(),
+        };
+
+        const { error } = await supabase
+            .from('user-preferences')
+            .upsert(updates, { onConflict: ['id'] });
+
+        if (error) throw error;
+
+    } catch (error) {
+        if (error) Alert.alert(error.message);
+    } finally {
+        setLoading(false);
     }
-    
+}
 
     return {
-        loading,
         tempUnit,
         setTempUnit,
         tempRange,
@@ -94,7 +93,8 @@ export default function usePreferences( ) {
         setOccupancySensitivity,
         energyPriority,
         setEnergyPriority,
-        getPreferences,
         updatePreferences,
+        getPreferences,
+        loading
       };
 };

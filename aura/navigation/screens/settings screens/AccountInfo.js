@@ -108,8 +108,6 @@ export default function AccountInfo ({ navigation }) {
                     <Text style={MainScreensStyle.accountInfo}>{username}</Text>
                     <Text style={MainScreensStyle.accountInfoLabel}>Email</Text>
                     <Text style={MainScreensStyle.accountInfo}>{email}</Text>
-                    <Text style={MainScreensStyle.accountInfoLabel}>Password</Text>
-                    <Text style={MainScreensStyle.accountInfo}>{password}</Text>
                 </View>
             </View>
         </View>

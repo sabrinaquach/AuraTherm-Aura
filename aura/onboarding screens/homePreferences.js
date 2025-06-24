@@ -36,6 +36,8 @@ const Preferences = ({ navigation }) => {
     const [Energyvalue, setEnergyValue] = useState(0);
     const EnergyEnumValues = ['Comfort', 'Eco', 'Balanced'];
     const [EnergyIndex, setEnergyIndex] = useState(0);
+    const [energyPriority, setEnergyPriority] = useState(EnergyEnumValues[0]);
+    
     const handleSliderChange = (val) => {
         setEnergyIndex(val);
         setEnergyPriority(EnergyEnumValues[val]);
@@ -46,11 +48,9 @@ const Preferences = ({ navigation }) => {
     const {
         occupancySensitivity,
         setOccupancySensitivity,
-        energyPriority,
-        setEnergyPriority,
         updatePreferences,
         loading,
-        } = usePreferences();
+    } = usePreferences();
 
     
     return (
@@ -136,7 +136,7 @@ const Preferences = ({ navigation }) => {
                       })
                       
                     
-                      navigation.navigate('NetworkPairing');
+                      navigation.navigate('NetworkPairing');r
                   }}
             />
         </View>

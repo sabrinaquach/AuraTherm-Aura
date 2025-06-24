@@ -4,6 +4,7 @@ import { Keyboard } from 'react-native';
 export default function useLoginValidation(onValid) {
   const [errors, setErrors] = useState({});
   const [inputs, setInputs] = useState({
+    username: '',
     email: '',
     password: '',
   });
@@ -11,6 +12,10 @@ export default function useLoginValidation(onValid) {
   const validate = () => {
     Keyboard.dismiss();
     let valid = true;
+    if (!inputs.email) {
+      handleError('Please input username', 'username');
+      valid = false;
+    }
 
     if (!inputs.email) {
       handleError('Please input email', 'email');

@@ -6,184 +6,78 @@ import Icon from 'react-native-vector-icons/Feather';
 import MainScreensStyle from '../../../style/MainScreenStyles';
 import Avatar from '../../../component/profile/avatar';
 import UploadModal from '../../../component/profile/UploadModal';
+import useAvatar from '../../../utilties/useAvatar';
+import supabase from '../../../auth/client';
 import Input from '../../../component/input';
 import Button from '../../../component/button';
+import useLoginValidation from '../../../utilties/useLoginValidation';
 
 const EditAccountInfo = ({ navigation }) => {
-    //profile - display set username
+    const [modalVisible, setModalVisible] = useState(false);
+
+    //profile - display username, email, password
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     useEffect (() => {
         const loadUserData = async () => {
-            const findUser = await AsyncStorage.getItem('user');
-            if (findUser) {
-                const user = JSON.parse(findUser);
-                setUsername(user.username);
-                setEmail(user.email);
-                setPassword(user.password);
+            const { data } = await supabase.auth.getSession();
+            const user = data?.session?.user;
+            const username = user?.user_metadata?.username;
+            const email = user?.user_metadata?.email;
+            const password = user?.user_metadata?.password;
+
+            if (username) {
+                setUsername(username);
+                setEmail(email);
+                setPassword(password);
             }
         };
         loadUserData();
     }, []);
 
-    //profile - upload image
-        const [modalVisible, setModalVisible] = useState(false);
+    //call useAvatar.js - load user data for pfp
+    const { image, setImage, saveImage, removeImage } = useAvatar();
     
-        const [image, setImage] = useState();
-        const uploadImage = async (mode) => {
-            try {
-                let result = {};
-    
-                if (mode === "gallery") {
-                    await ImagePicker.requestMediaLibraryPermissionsAsync();
-                    result = await ImagePicker.launchImageLibraryAsync({
-                        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                        allowsEditing: true,
-                        aspect: [1, 1],
-                        quality: 1,
-                    });
-                } else {
-                    await ImagePicker.requestCameraPermissionsAsync();
-                    result = await ImagePicker.launchCameraAsync({
-                        cameraType: ImagePicker.CameraType.front,
-                        allowsEditing: true,
-                        aspect: [1, 1],
-                        quality: 1,
-                    });
-                }
-    
-                if (!result.canceled) {
-                    await saveImage(result.assets[0].uri);
-                }
-            } catch (error) {
-                alert("Error uploading image: " + error.message);
-                setModalVisible(false);
-            }
-        };
-    
-        //profile - remove image
-        const removeImage = async () => {
-            try {
-                saveImage(null);
-            } catch ({ message }) {
-                alert(message);
-                setModalVisible(false);
-            }
-        }; 
-    
-        const saveImage = async (image) => {
-            try {
-                setImage(image);
-    
-                //make api call to save image when set
-                // sendToBackend();
-    
-                setModalVisible(false);
-            } catch (error) {
-                throw error;
-            }
-        };
+    const uploadImage = async (mode) => {
+        try {
+            let result = {};
 
-    //error handling & validation for input boxes
-    //check if user has account before uploading image
-    useEffect(() => {
-        const checkAuth = async () => {
-            const { data, error } = await supabase.auth.getSession();
-            if (error) {
-                console.error('Error getting session:', error);
-            } else if (!data.session) {
-                console.log('User is not authenticated.');
+            if (mode === "gallery") {
+                await ImagePicker.requestMediaLibraryPermissionsAsync();
+                result = await ImagePicker.launchImageLibraryAsync({
+                    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                    allowsEditing: true,
+                    aspect: [1, 1],
+                    quality: 1,
+                });
             } else {
-                console.log('User is authenticated:', data.session.user);
+                await ImagePicker.requestCameraPermissionsAsync();
+                result = await ImagePicker.launchCameraAsync({
+                    cameraType: ImagePicker.CameraType.front,
+                    allowsEditing: true,
+                    aspect: [1, 1],
+                    quality: 1,
+                });
             }
-        };
-      
-        checkAuth();
-    }, []);
 
-    // const {inputs: currentInputs} = checkAuth();
-    // const [inputs, setInputs] = useState({
-    //     username: "",
-    //     email: "",
-    //     password: "",
-    // });
-
-    // useEffect(() => {
-    //     if(currentInputs) {
-    //         setUser({
-    //             email: currentUser.email || "",
-    //             password: currentUser.password || "",
-    //             image: currentUser.image || null,
-    //         })
-    //     }
-    // }, []);
-
-    const [errors, setErrors] = useState({});
-
-    const [loading, setLoading] = useState(false);
-
-    const validate = () => {
-        Keyboard.dismiss();
-        let valid = true;
-
-        //username and password validation
-        if(!inputs.username) {
-            handleError('Please input username', 'username');
-            valid = false;
-        } 
-        if(!inputs.password) {
-            handleError('Please input password', 'password');
-            valid = false;
-        } else if(inputs.password.length < 8) {
-            handleError('Minimum password length of 8 characters', 'password');
-            valid = false;
-        }
-
-        //email validation
-        if(!inputs.email) {
-            handleError('Please input email', 'email');
-            valid = false;
-        } else if (!inputs.email.match(/\S+@\S+\.\S+/)) {
-            handleError('Please input valid email', 'email');
-            valid = false;
-        }
-
-        //terms validation
-        if(!isSelected) {
-            handleError('Please accept the terms', 'terms');
-            valid = false;
-        } else {
-            handleError(null, 'terms');
-        }
-
-        if(valid) {
-            register();
-        }
-    };
-
-    const register = () => {
-        setLoading(true);
-        setTimeout(() => {
-            setLoading(false);
-
-            try {
-                AsyncStorage.setItem("user", JSON.stringify(inputs));
-                navigation.navigate('Login');
-            } catch (error) {
-                Alert.alert('Error', 'Something went wrong');
+            if (!result.canceled) {
+                await saveImage(result.assets[0].uri);
             }
-        }, 2000);
+        } catch (error) {
+            alert("Error uploading image: " + error.message);
+            setModalVisible(false);
+        }
     };
-
-    const handleOnChange = (text, input) => {
-        setInputs(prevState => ({...prevState, [input] : text}));
-    };
-
-    const handleError = (errorMessage, input) => {
-        setErrors((prevState) => ({...prevState, [input] : errorMessage}));
-    };
+    //call LoginValidation.js - ensure user enters inputs
+        const {
+            inputs,
+            errors,
+            handleOnChange,
+            handleError,
+            validate,
+          } = useLoginValidation();
 
     //save changes
     const [savingChanges, setSavingChanges] = useState(false);
@@ -191,7 +85,10 @@ const EditAccountInfo = ({ navigation }) => {
         try {
             setSavingChanges(true);
 
-            // sendToBackend();
+            const { error } = await supabase.auth.updateUser({
+                email,
+                data: { username },
+              });
 
             setSavingChanges(false);
             navigation.navigate("AccountInfo");
@@ -200,36 +97,6 @@ const EditAccountInfo = ({ navigation }) => {
             setSavingChanges(false);
         }
     }
-
-    // const sendToBackend = async () => {
-    //     try {
-    //         const formData = new FormData();
-
-    //         formData.append("username", username);
-    //         formData.append("email", email);
-    //         formData.append("password", password);
-    //         formData.append("image", {
-    //             uri: image,
-    //             type: "image/png",
-    //             name: "product-image",
-    //         });
-
-    //         const config = {
-    //             headers: {
-    //                 "Content-Type": "multipart/form-data",
-    //              },
-    //             transformRequest: () => {
-    //                 return formData;
-    //             },
-    //         };
-
-    //         await axios.post("API link", formData, config);
-
-    //         alert("sucess");
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // }
 
     return (
         <View style={MainScreensStyle.container}>
@@ -280,22 +147,11 @@ const EditAccountInfo = ({ navigation }) => {
                     onChangeText={text => handleOnChange(text, 'email')}
 
                 />
-                <Input
-                    label="Password"
-                    placeholder={password}
-                    placeholderTextColor='gray'
-                    error={errors.password}
-                    onFocus={() => {
-                        handleError(null, 'password')
-                    }}
-                    onChangeText={text => handleOnChange(text, 'password')}
-                    password
-                />
             </View>
             <Button 
                 backgroundColor="#A3C858C9"
                 title="Save Changes" 
-                onPress={validate}
+                onPress={saveChanges}
             />
         </View>
     )
