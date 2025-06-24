@@ -9,37 +9,7 @@ import { SelectList } from 'react-native-dropdown-select-list';
 import MainScreensStyle from '../../../style/MainScreenStyles';
 
 export default function MainPreferences ({ navigation }) {
-    // const FormData = global.FormData;
-
-
-    // const sendToBackend = async () => {
-    //     try {
-    //         const formData = new FormData();
-
-    //         formData.append("image", {
-    //             uri: image,
-    //             type: "image/png",
-    //             name: "profile-image",
-    //         });
-
-    //         const config = {
-    //             headers: {
-    //                 "Content-Type": "multipart/form-data"
-    //             },
-    //             tranformRequest: () => {
-    //                 return formData;
-    //             },
-    //         };
-
-    //         await axios.post("API LINK HERE", formData, config);
-
-    //         alert("success");
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // }
-
-        //dropdowns
+    //dropdowns
     const [tempUnit, setTempUnit] = useState("");
     const [tempPreferences, setTempPreferences] = useState("");
     const [tempOptions, setTempOptions] = useState("");
@@ -66,6 +36,24 @@ export default function MainPreferences ({ navigation }) {
     const [Energyvalue, setEnergyValue] = useState(1);
     const Occupancylabels = ['Low', 'High'];
     const Energylabels = ['Comfort', 'Eco', 'Balanced'];
+
+    useEffect (() => {
+        const loadUserData = async () => {
+            const { data } = await supabase.auth.getSession();
+            const user = data?.session?.user;
+            const tempUnit = user?.user_metadata?.username;
+            const tempRange = user?.user_metadata?.email;
+            const occupancySensitivity = user?.user_metadata?.password;
+            const energyPriority = user?.user_metadata?.password;
+
+            if (username) {
+                setUsername(username);
+                setEmail(email);
+                setPassword(password);
+            }
+        };
+        loadUserData();
+    }, []);
     
     return (
         <ScrollView style={MainScreensStyle.ScrollView} bounces={false}>

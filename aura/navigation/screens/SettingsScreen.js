@@ -10,6 +10,7 @@ import UploadModal from '../../component/profile/UploadModal';
 import Loader from '../../component/loader';
 import supabase from '../../auth/client';
 import useAvatar from '../../utilties/useAvatar';
+import usePreferences from '../../utilties/usePreferences';
 
 export default function SettingsScreen ({ navigation }) {
     //profile - display username
@@ -65,7 +66,7 @@ export default function SettingsScreen ({ navigation }) {
         }
     };
       
-    //supabase - log out
+    //supabase - log outsetOccupancySensitivity
     const [loading, setLoading] = useState(false);
     const handleLogout = async () => {
         setLoading(true);
@@ -87,6 +88,16 @@ export default function SettingsScreen ({ navigation }) {
     const [Energyvalue, setEnergyValue] = useState(1);
     const Occupancylabels = ['Low', 'High'];
     const Energylabels = ['Comfort', 'Eco', 'Balanced'];
+    
+    //call usePreferences.js - load user preferences
+    const {
+        occupancySensitivity,
+        setOccupancySensitivity,
+        energyPriority,
+        setEnergyPriority,
+        updatePreferences,
+        // loading,
+      } = usePreferences();
     
     return (
         <View style={{ flex: 1 }}>
@@ -121,8 +132,8 @@ export default function SettingsScreen ({ navigation }) {
                         minimumValue={0}
                         maximumValue={2}
                         step={0.1}
-                        value={Occupancyvalue}
-                        onValueChange={setOccupancyValue}
+                        value={occupancySensitivity}
+                        onValueChange={setOccupancySensitivity}
                         minimumTrackTintColor="#D9D9D9"
                         maximumTrackTintColor="#D9D9D9"
                         thumbTintColor="#A3C858C9"

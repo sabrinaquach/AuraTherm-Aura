@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import onboardingStyle from '../style/onboardingStyle.js';
 import Button from '../component/button.js'
 import DotProgress from'../component/dotIndicator.js'
+import usePreferences from '../utilties/usePreferences.js';
 
 const Preferences = ({ navigation }) => {
     //dropdowns
@@ -19,22 +20,39 @@ const Preferences = ({ navigation }) => {
         {key:'C', value:'Celsius (°C)'},
     ]
     const fahrenheitTemp = [
-        {key:'1', value:'60°F – 65°F (Cool)'},
-        {key:'2', value:'66°F – 70°F (Mild Cool)'},
-        {key:'3', value: '71°F – 75°F (Neutral)'},
-        {key:'4', value: '76°F – 80°F (Warm)'},
+        {key:'60-65', value:'60°F – 65°F (Cool)'},
+        {key:'66-70', value:'66°F – 70°F (Mild Cool)'},
+        {key:'71-75', value: '71°F – 75°F (Neutral)'},
+        {key:'76-80', value: '76°F – 80°F (Warm)'},
     ]
     const celsiusTemp = [
-        {key:'a', value: '16°C – 18°C (Cool)'},
-        {key:'b', value: '19°C – 21°C (Mild Cool)'},
-        {key:'c', value: '22°C – 24°C (Neutral)'},
-        {key:'d', value: '25°C – 27°C (Warm)'},
+        {key:'16-18', value: '16°C – 18°C (Cool)'},
+        {key:'19-21', value: '19°C – 21°C (Mild Cool)'},
+        {key:'22-24', value: '22°C – 24°C (Neutral)'},
+        {key:'25-27', value: '25°C – 27°C (Warm)'},
     ]
 
     //slider
-    const [Energyvalue, setEnergyValue] = useState(1);
-    const Energylabels = ['Comfort', 'Eco', 'Balanced'];
+    const [Energyvalue, setEnergyValue] = useState(0);
+    const EnergyEnumValues = ['Comfort', 'Eco', 'Balanced'];
+    const [EnergyIndex, setEnergyIndex] = useState(0);
+    const handleSliderChange = (val) => {
+        setEnergyIndex(val);
+        setEnergyPriority(EnergyEnumValues[val]);
+    };
+    const [occupancyValue, setOccupancyValue] = useState(1);
 
+    //call usePreferences.js - load user preferences
+    const {
+        occupancySensitivity,
+        setOccupancySensitivity,
+        energyPriority,
+        setEnergyPriority,
+        updatePreferences,
+        loading,
+        } = usePreferences();
+
+    
     return (
         <View style={styles.container}>
             <Text style={onboardingStyle.title}>Your Home</Text>
@@ -60,6 +78,7 @@ const Preferences = ({ navigation }) => {
                     setSelected={setTempPreferences}
                     data={tempOptions}
                     placeholder="Select Temperature Range"
+                    save="key"
                     inputonboardingStyle={{padding: 1}}
                     arrowicon={<Icon name="chevron-down" size={20} color="#333" />}
                     searchicon={<Icon name="search" size={20} color="#333" paddingRight={5} />}
@@ -69,7 +88,7 @@ const Preferences = ({ navigation }) => {
             <View style={onboardingStyle.sliderContainer}>
                 <Text style={onboardingStyle.subtitle}>Choose the Setting That Fits You</Text>
                 <View style={onboardingStyle.labelsContainer}>
-                    {Energylabels.map((label) => (
+                    {EnergyEnumValues.map((label) => (
                         <Text key={label} style={onboardingStyle.labelText}>{label}</Text>
                     ))}
                 </View>
@@ -78,8 +97,8 @@ const Preferences = ({ navigation }) => {
                     minimumValue={0}
                     maximumValue={2}
                     step={1}
-                    value={Energyvalue}
-                    onValueChange={setEnergyValue}
+                    value={EnergyIndex}
+                    onValueChange={handleSliderChange}
                     minimumTrackTintColor="#D9D9D9"
                     maximumTrackTintColor="#D9D9D9"
                     thumbTintColor="#A3C858C9"
@@ -95,7 +114,30 @@ const Preferences = ({ navigation }) => {
             <Button 
                 backgroundColor="#A3C858C9"
                 title="Pair Device to Network" 
-                onPress={() => navigation.navigate('NetworkPairing')}
+                onPress={async () => {
+                    if (!tempUnit || !tempPreferences) {
+                        alert("Please select both temperature unit and temperature range.");
+                        return;
+                      }
+                    
+                      const energyMap = ['Comfort', 'Eco', 'Balanced'];
+                    
+                      await updatePreferences({
+                        tempUnit,
+                        tempRange: tempPreferences,
+                        occupancySensitivity: occupancyValue,
+                        energyPriority,
+                      });
+
+                      console.log({
+                        tempRange: tempPreferences,
+                        tempUnit,
+                        energyPriority,
+                      })
+                      
+                    
+                      navigation.navigate('NetworkPairing');
+                  }}
             />
         </View>
     )
