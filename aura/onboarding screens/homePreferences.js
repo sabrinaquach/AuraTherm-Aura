@@ -118,7 +118,7 @@ const Preferences = ({ navigation }) => {
                     if (!tempUnit || !tempPreferences) {
                         alert("Please select both temperature unit and temperature range.");
                         return;
-                      }
+                    }
                     
                       const energyMap = ['Comfort', 'Eco', 'Balanced'];
                     
@@ -136,9 +136,15 @@ const Preferences = ({ navigation }) => {
                       })
                       
                     
-                      navigation.navigate('NetworkPairing');r
+                      navigation.navigate('NetworkPairing');
                   }}
             />
+            <Text 
+                    style={onboardingStyle.skipDescription}
+                    onPress={() => navigation.navigate('NetworkPairing')}
+                >
+                    Skip
+                </Text>
         </View>
     )
 }

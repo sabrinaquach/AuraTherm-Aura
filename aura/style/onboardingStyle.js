@@ -88,6 +88,13 @@ const onboardingStyle = StyleSheet.create ({
         textAlign: 'center',
         bottom: 40,
     },
+    skipDescription: {
+        fontSize: 14,
+        fontWeight: '500',
+        textAlign: 'center',
+        bottom: 40,
+        color: 'gray'
+    },
     termsError: {
         color: 'red',
         fontSize: 12,

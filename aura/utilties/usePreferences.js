@@ -40,10 +40,9 @@ export default function usePreferences( ) {
 
             if (data) {
                 setTempUnit(data.tempUnit || '');
-                setTempRange(data.TempRange || '');
-                setTempPreferences(data.tempRange || '');
-                setOccupancySensitivity(data.ccupancySensitivity || '');
-                setEnergyPriority(data.EnergyPriority || '');
+                setTempRange(data.tempRange || '');
+                setOccupancySensitivity(data.occupancySensitivity || '');
+                setEnergyPriority(data.energyPriority || '');
             }
         } catch (error) {
             if (error) {

@@ -9,6 +9,7 @@ import Avatar from '../../../component/profile/avatar';
 import UploadModal from '../../../component/profile/UploadModal';
 import useAvatar from '../../../utilties/useAvatar';
 import supabase from '../../../auth/client';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function AccountInfo ({ navigation }) {
     const [modalVisible, setModalVisible] = useState(false);
@@ -70,7 +71,7 @@ export default function AccountInfo ({ navigation }) {
     };
     
     return (
-        <View style={MainScreensStyle.container}>
+        <SafeAreaView style={MainScreensStyle.SafeArea}>
             <View style={MainScreensStyle.headerContainer}>
                 <TouchableOpacity 
                     style={MainScreensStyle.backButton}
@@ -110,6 +111,7 @@ export default function AccountInfo ({ navigation }) {
                     <Text style={MainScreensStyle.accountInfo}>{email}</Text>
                 </View>
             </View>
-        </View>
+        </SafeAreaView>
+        
     );
 }

@@ -11,7 +11,7 @@ export default function HistoryScreen ({ navigation }) {
                 style={MainScreensStyle.title}
                 onPress={() => navigation.navigate('Home')}
             >
-            Aura</Text>
+            History</Text>
             <ControlTab 
                 labelOne="Today"
                 labelTwo="Yesterday"

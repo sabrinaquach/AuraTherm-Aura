@@ -20,22 +20,24 @@ const EditAccountInfo = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    useEffect (() => {
+    useEffect(() => {
         const loadUserData = async () => {
             const { data } = await supabase.auth.getSession();
             const user = data?.session?.user;
             const username = user?.user_metadata?.username;
-            const email = user?.user_metadata?.email;
-            const password = user?.user_metadata?.password;
-
-            if (username) {
+            const email = user?.email;
+    
+            if (username || email) {
                 setUsername(username);
                 setEmail(email);
-                setPassword(password);
+    
+                handleOnChange(username, 'username');
+                handleOnChange(email, 'email');
             }
         };
         loadUserData();
     }, []);
+    
 
     //call useAvatar.js - load user data for pfp
     const { image, setImage, saveImage, removeImage } = useAvatar();
@@ -82,21 +84,33 @@ const EditAccountInfo = ({ navigation }) => {
     //save changes
     const [savingChanges, setSavingChanges] = useState(false);
     const saveChanges = async () => {
+        const isValid = validate();
+        if (!isValid) return;
+    
         try {
             setSavingChanges(true);
-
+    
             const { error } = await supabase.auth.updateUser({
-                email,
-                data: { username },
-              });
-
-            setSavingChanges(false);
-            navigation.navigate("AccountInfo");
-        } catch ({ message }) {
-            alert(message);
+                email: inputs.email,
+                data: {
+                    username: inputs.username,
+                },
+            });
+    
+            if (error) {
+                Alert.alert("Update failed", error.message);
+            } else {
+                Alert.alert("Success", "Account updated successfully.");
+                navigation.navigate("AccountInfo");
+            }
+    
+        } catch (error) {
+            Alert.alert("Error", error.message);
+        } finally {
             setSavingChanges(false);
         }
-    }
+    };
+    
 
     return (
         <View style={MainScreensStyle.container}>
@@ -128,7 +142,8 @@ const EditAccountInfo = ({ navigation }) => {
             <View> 
                 <Input
                     label="Username"
-                    placeholder={username}
+                    value={inputs.username}
+                    placeholder='Enter new username'
                     placeholderTextColor='gray'
                     error={errors.username}
                     onFocus={() => {
@@ -138,7 +153,8 @@ const EditAccountInfo = ({ navigation }) => {
                 />
                 <Input
                     label="Email"
-                    placeholder={email}
+                    value={inputs.email}
+                    placeholder='Enter new email'
                     placeholderTextColor='gray'
                     error={errors.email}
                     onFocus={() => {

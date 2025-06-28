@@ -8,7 +8,6 @@ const Button = ({title, navigation, backgroundColor="#000", onPress = () => {}})
                 activeOpacity={0.7}
                 onPress={onPress}
                 style={[styles.button, { backgroundColor }]}
-                // onPress={() => navigation.navigate('')}
             >
                 <Text style={styles.buttonText}>{title}</Text>
             </TouchableOpacity>

@@ -11,7 +11,7 @@ export default function EnergyScreen ({ navigation }) {
                 style={MainScreensStyle.title}
                 onPress={() => navigation.navigate('Home')}
             >
-            Aura</Text>
+            Energy</Text>
             <ControlTab 
                 labelOne="Weekly"
                 labelTwo="Monthly"

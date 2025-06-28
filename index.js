@@ -4,6 +4,7 @@ import App from './App';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Toast from 'react-native-toast-message';
 
 import Splash from './aura/onboarding screens/splash.js';
 import Welcome from './aura/onboarding screens/welcome.js';
@@ -35,6 +36,7 @@ export default function OnboardingIndex() {
                 <Stack.Screen name="AccountInfo" component={AccountInfo} />
                 <Stack.Screen name="EditAccountInfo" component={EditAccountInfo} />
             </Stack.Navigator>
+            <Toast/>
         </NavigationContainer>
     );
 }

@@ -109,12 +109,12 @@ const MainScreensStyle = StyleSheet.create ({
         justifyContent: 'center',
         position: 'relative',
         paddingBottom: 15,
+        
     },
     backButton: {
         paddingBottom: 15,
         position: 'absolute',
         left: 0,
-
     },
     editAccountTitle: {
         fontSize: 20,
@@ -123,6 +123,27 @@ const MainScreensStyle = StyleSheet.create ({
     },
     ScrollView: {
         backgroundColor: '#fff',
+    },
+    SafeArea: {
+        flex: 1,
+        backgroundColor: '#fff',
+        paddingHorizontal: 20, 
+        paddingTop: 40,
+    },
+    occupancyContainer: {
+        flexDirection: 'row',
+        position: 'relative',
+        paddingBottom: 15,
+    },
+    sensitivityNumber: {
+        fontSize: 20,
+        fontWeight: '500',
+        position: 'absolute',
+        right: 0,
+    },
+    occupancyTitle: {
+        fontSize: 20,
+        fontWeight: '500',
     },
 });
 
