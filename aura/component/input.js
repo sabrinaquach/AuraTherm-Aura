@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import {View, Text, StyleSheet, TextInput} from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
+import { Feather, MaterialIcons } from '@expo/vector-icons';
 
 const Input = ({
     label,
@@ -32,7 +32,7 @@ const Input = ({
                     error="Input username"
                 />
                 {password && (
-                    <Icon 
+                    <Feather 
                         style={styles.icon}
                         name={hidePassword ? 'eye' : 'eye-off'} 
                         onPress={() => setHidePassword(!hidePassword)}

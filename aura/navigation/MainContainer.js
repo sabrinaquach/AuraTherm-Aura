@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Icon from 'react-native-vector-icons/Feather';
+import { Feather, MaterialIcons } from '@expo/vector-icons';
 
 import HomeScreen from '../navigation/screens/HomeScreen.js';
 import HistoryScreen from '../navigation/screens/HistoryScreen.js';
@@ -36,7 +36,7 @@ export default function MainContainer() {
                             iconName = focused ? 'settings' : 'settings'
                         }
 
-                        return <Icon name={iconName} size={size} color={color}/>
+                        return <Feather name={iconName} size={size} color={color}/>
                     },
 
                     tabBarActiveTintColor: '#A3C858',

@@ -36,3 +36,4 @@ aura/api-keys.js
 
 # typescript
 *.tsbuildinfo
+.expo/

@@ -1,4 +1,4 @@
-package com.aura
+package com.sabrinaquach.aura
 
 import android.app.Application
 import android.content.res.Configuration

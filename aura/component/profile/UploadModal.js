@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Pressable, ActivityIndicator } from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
+import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { Modal } from 'react-native';
 
 export default function UploadModal ({ 
@@ -23,7 +23,7 @@ export default function UploadModal ({
                                 style={styles.optionButton} 
                                 onPress={onCameraPress}
                             >
-                                <Icon 
+                                <Feather 
                                     name="camera"
                                     size={30}
                                     color="black"
@@ -35,7 +35,7 @@ export default function UploadModal ({
                                 style={styles.optionButton} 
                                 onPress={onGalleryPress}
                             >
-                                <Icon 
+                                <Feather 
                                     name="image"
                                     size={30}
                                     color="black"
@@ -47,7 +47,7 @@ export default function UploadModal ({
                                 style={styles.optionButton} 
                                 onPress={onRemovePress}
                             >
-                                <Icon 
+                                <Feather 
                                     name="trash"
                                     size={30}
                                     color="black"

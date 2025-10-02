@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
+import { Feather, MaterialIcons } from '@expo/vector-icons';
 
 import placeholder from '../../assets/blank-profile-picture-973460_1280.png'
 
@@ -29,7 +29,7 @@ export default function Avatar ({
 
             {!aviOnly && (
                 <TouchableOpacity style={styles.editButton} onPress={onButtonPress}>
-                    <Icon 
+                    <Feather 
                         style={styles.icon}
                         name="plus"
                         size={30}

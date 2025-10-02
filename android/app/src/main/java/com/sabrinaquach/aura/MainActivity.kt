@@ -1,4 +1,4 @@
-package com.aura
+package com.sabrinaquach.aura
 
 import android.os.Build
 import android.os.Bundle
