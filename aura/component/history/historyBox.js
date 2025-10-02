@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
+import { Feather, MaterialIcons } from '@expo/vector-icons';
 import usePreferences from '../../utilties/usePreferences';
 
 export default function HistoryBox ({ time, room, temp, currentTemp, newTemp, mode }) {
@@ -37,7 +37,7 @@ export default function HistoryBox ({ time, room, temp, currentTemp, newTemp, mo
     return (
         <View style={Style.historyContainer}>
             <View style={Style.historyRow}>
-                <Icon 
+                <Feather 
                     name="users"
                     size="28"
                 />
@@ -53,7 +53,7 @@ export default function HistoryBox ({ time, room, temp, currentTemp, newTemp, mo
                                 <Text style={Style.modeText}>{mode}</Text>
                             </View>
                             <View style={Style.currentTempContainer}>
-                                <Icon 
+                                <Feather 
                                     name="thermometer"
                                     size="15"
                                     color={thermometerColor}
