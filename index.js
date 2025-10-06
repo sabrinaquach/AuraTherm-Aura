@@ -5,6 +5,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Toast from 'react-native-toast-message';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 import Splash from './aura/onboarding screens/splash.js';
 import Welcome from './aura/onboarding screens/welcome.js';
@@ -22,6 +23,7 @@ const Stack = createNativeStackNavigator();
 
 export default function OnboardingIndex() {
     return (
+        <GestureHandlerRootView style={{ flex: 1 }}>
         <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false, animation: 'none' }}>
                 <Stack.Screen name="Splash" component={Splash} />
@@ -38,6 +40,7 @@ export default function OnboardingIndex() {
             </Stack.Navigator>
             <Toast/>
         </NavigationContainer>
+        </GestureHandlerRootView>
     );
 }
 registerRootComponent(App);
