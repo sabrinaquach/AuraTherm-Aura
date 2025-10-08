@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system';
+import { File, Directory, Paths } from 'expo-file-system';
+import * as FS from 'expo-file-system/legacy';
 import mime from 'mime'; 
 import { Buffer } from 'buffer';
+import { decode } from 'base64-arraybuffer';
 global.Buffer = Buffer;
 
 import supabase from '../auth/client';
@@ -21,8 +23,8 @@ export default function useAvatar() {
         const fileExt = uri.split('.').pop();
         const fileName = `${Date.now()}.${fileExt}`;
         const fileType = mime.getType(uri) || 'image/png';
-        const base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
-        const buffer = Buffer.from(base64, 'base64');
+        const base64 = await FS.readAsStringAsync(uri, { encoding: FS.EncodingType.Base64 });
+        const buffer = decode(base64);
     
         const { data, error } = await supabase.storage
             .from('profile-image')

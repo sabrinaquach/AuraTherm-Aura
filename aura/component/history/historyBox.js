@@ -121,6 +121,7 @@ const Style = StyleSheet.create ({
         height: 22,
         borderWidth: 1,
         borderRadius: 10,
+        justifyContent: 'center',
         // borderColor: 'modeBackground',
         // backgroundColor: 'modeBackground',
     },
