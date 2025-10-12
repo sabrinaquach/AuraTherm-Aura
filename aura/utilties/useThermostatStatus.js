@@ -1,4 +1,3 @@
-// utilties/useThermostatStatus.js
 import { useCallback, useEffect, useState } from "react";
 
 export default function useThermostatStatus() {

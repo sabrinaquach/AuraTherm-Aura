@@ -1,4 +1,3 @@
-// utilties/dialMath.js
 export const RAD = Math.PI / 180;
 export const DEG = 180 / Math.PI;
 
@@ -32,17 +31,4 @@ export function isPointOnRing(x, y, cx, cy, r, band) {
   'worklet';
   const d = Math.hypot(x - cx, y - cy);
   return d >= (r - band) && d <= (r + band);
-}
-
-export function progressFraction(angleRad, thetaMinDeg, thetaMaxDeg) {
-  'worklet';
-  const tMin = thetaMinDeg * RAD;
-  const span = (thetaMaxDeg - thetaMinDeg) * RAD;
-  return clamp((angleRad - tMin) / span, 0, 1);
-}
-
-export function snapValue(value, min, max, step) {
-  'worklet';
-  const ticks = Math.round((value - min) / step);
-  return clamp(min + ticks * step, min, max);
 }
