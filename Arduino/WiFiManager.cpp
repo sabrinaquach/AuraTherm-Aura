@@ -1,33 +1,37 @@
 #include "WiFiManager.h"
+#include <WiFi.h>
 
-//Home
-// const char* ssid = "Luna South-5G";
-// const char* password = "Luna5West225$";
-
-//Campus
-// const char* ssid = "SJSU_guest";
-// const char* password = "";
-
-// Hotspot
+//Hotspot
 const char* ssid = "Grike";
 const char* password = "ChickenWang1738";
+
+bool wifiConnected = false;
+unsigned long wifiStartTime = 0;
+const unsigned long wifiTimeout = 30000; // 30 sec
 
 void setupWiFi() {
     Serial.print("Connecting to Wi-Fi");
     WiFi.begin(ssid, password);
+    wifiStartTime = millis();
+    wifiConnected = false;
+}
 
-    unsigned long startAttemptTime = millis();
-    // Try for max 10 seconds
-    while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < 10000) {
-        delay(500);
-        Serial.print(".");
-    }
+void checkWiFi() {
+    if (wifiConnected) return;
 
     if (WiFi.status() == WL_CONNECTED) {
+        wifiConnected = true;
         Serial.print("\nWi-Fi connected! IP: ");
         Serial.println(WiFi.localIP());
-    } else {
+    } else if (millis() - wifiStartTime > wifiTimeout) {
+        wifiConnected = false;
         Serial.println("\nFailed to connect to Wi-Fi");
+    } else {
+        static unsigned long lastDot = 0;
+        if (millis() - lastDot >= 500) {
+            Serial.print(".");
+            lastDot = millis();
+        }
     }
 }
 
