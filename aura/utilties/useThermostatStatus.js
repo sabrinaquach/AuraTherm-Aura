@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 export default function useThermostatStatus() {
-  const [data, setData] = useState(null);   // { targetTemp, currentTemp, mode }
+  const [data, setData] = useState(null); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -9,7 +9,7 @@ export default function useThermostatStatus() {
     let mounted = true;
     (async () => {
       try {
-        await new Promise(r => setTimeout(r, 250)); // simulate
+        await new Promise(r => setTimeout(r, 250));
         if (!mounted) return;
         setData({ targetTemp: 70, currentTemp: 72, mode: "off" });
       } catch (e) {

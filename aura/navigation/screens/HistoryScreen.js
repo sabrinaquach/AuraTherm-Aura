@@ -8,11 +8,7 @@ import HistoryBox from '../../component/history/historyBox';
 export default function HistoryScreen ({ navigation }) {
     return (
         <View style={MainScreensStyle.container}>
-            <Text 
-                style={MainScreensStyle.title}
-                onPress={() => navigation.navigate('Home')}
-            >
-            History</Text>
+            <Text style={MainScreensStyle.title}>History</Text>
             <ControlTab 
                 labelOne="Today"
                 labelTwo="Yesterday"

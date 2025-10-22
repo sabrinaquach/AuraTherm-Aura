@@ -4,7 +4,6 @@ import { GestureDetector } from "react-native-gesture-handler";
 import { Canvas, Path, Skia, BlurMask, Circle, Group } from "@shopify/react-native-skia";
 import { useDial } from "../../utilties/useDial";
 
-// safe alpha helper
 function withAlpha(hex, a) {
   const h = hex.replace('#','');
   const rgb = h.length === 8 ? h.slice(0,6) : h;
@@ -22,7 +21,7 @@ export default function ThermostatDial({
   thetaMaxDeg = 120,
   dialColor = "#A3C858FF",
 
-  // visuals
+  //visuals of temp dial
   glowSigma = 36,
   trackWidth = 12,
   progressWidth = 28,
@@ -30,16 +29,16 @@ export default function ThermostatDial({
   innerGap = 56,
   innerWidth = 6,
   glowEnabled = true,
-  showHandle = true,        // <- handle visible by default
+  showHandle = true,     
   forceFullArc = false,
 
-  // layout
+  //layout of dial
   width,
   height,
   xShiftR = 1.18,
   yShiftR = 0.07,
 
-  // gesture / feel
+  //gestures
   mirrorX = true,
   mirrorMode = "full",
   mode = "infinite",
@@ -50,7 +49,6 @@ export default function ThermostatDial({
   stepSnapOnEnd = 1,
   dragSign = -1,
 }) {
-  // measure if explicit size not provided
   const [box, setBox] = useState({ w: 0, h: 0 });
   const needMeasure = width === undefined || height === undefined;
   const onLayout = (e) => {
@@ -59,7 +57,6 @@ export default function ThermostatDial({
     setBox({ w, h });
   };
 
-  // extra room for glow
   const bleed = useMemo(() => progressWidth / 2 + 3 * glowSigma, [progressWidth, glowSigma]);
 
   const { cx, cy, r } = useMemo(() => {
@@ -73,7 +70,7 @@ export default function ThermostatDial({
     return { cx: cxShifted, cy: cyShifted, r: rr };
   }, [box.w, box.h, width, height, bleed, xShiftR, yShiftR]);
 
-  // paths
+  //paths
   const arc = useMemo(() => {
     const p = Skia.Path.Make();
     if (r <= 0) return p;
@@ -91,7 +88,7 @@ export default function ThermostatDial({
     return p;
   }, [cx, cy, r, innerGap, thetaMinDeg, thetaMaxDeg]);
 
-  // dial math & gesture
+  //dial math and gesture
   const dial = useDial({
     value, min, max, thetaMinDeg, thetaMaxDeg, cx, cy, r,
     hitBand: 28,
@@ -100,7 +97,6 @@ export default function ThermostatDial({
     mode, infiniteBehavior,
     pxPerFullSweep, smoothK, flingBoost, stepSnapOnEnd, dragSign,
 
-    // ensure you can hit 50 & 90 while dragging and on release
     edgeSnapValue: 0.75,
   });
 
@@ -114,15 +110,12 @@ export default function ThermostatDial({
       {ready && (
         <GestureDetector gesture={forceFullArc ? undefined : dial.pan}>
           <Canvas style={StyleSheet.absoluteFill}>
-            {/* flip drawing across the dial center */}
+            {/* flip dial */}
             <Group transform={[{ translateX: cx }, { scaleX: mirrorX ? -1 : 1 }, { translateX: -cx }]}>
-
-              {/* faint outer track */}
               {trackWidth > 0 && (
                 <Path path={arc} style="stroke" color={trackColor} strokeWidth={trackWidth} strokeCap="round" />
               )}
 
-              {/* glowing progress */}
               <Path
                 path={arc}
                 style="stroke"
@@ -135,7 +128,6 @@ export default function ThermostatDial({
                 {glowEnabled && <BlurMask blur={glowSigma} style="outer" />}
               </Path>
 
-              {/* crisp progress */}
               <Path
                 path={arc}
                 style="stroke"
@@ -151,7 +143,6 @@ export default function ThermostatDial({
                 <Path path={arcInner} style="stroke" color={withAlpha(dialColor, 0.55)} strokeWidth={innerWidth} strokeCap="round" />
               )}
 
-              {/* HANDLE / KNOB at end of progress */}
               {showHandle && (
                 <>
                   <Circle cx={dial.notch.x} cy={dial.notch.y} r={handleRadius} color={progressColor} />
@@ -167,5 +158,9 @@ export default function ThermostatDial({
 }
 
 const styles = StyleSheet.create({
-  root: { width: "100%", aspectRatio: 1, overflow: 'visible' },
+  root: { 
+    width: "100%", 
+    aspectRatio: 1, 
+    overflow: 'visible' 
+  },
 });

@@ -33,6 +33,7 @@ yarn-error.*
 .env*.local
 aura/auth/client.js
 aura/api-keys.js
+supabase
 
 # typescript
 *.tsbuildinfo

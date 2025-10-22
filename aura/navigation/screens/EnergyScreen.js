@@ -7,11 +7,7 @@ import ControlTab from '../../component/controlTab';
 export default function EnergyScreen ({ navigation }) {
     return (
         <View style={MainScreensStyle.container}>
-            <Text 
-                style={MainScreensStyle.title}
-                onPress={() => navigation.navigate('Home')}
-            >
-            Energy</Text>
+            <Text style={MainScreensStyle.title}>Energy</Text>
             <ControlTab 
                 labelOne="Weekly"
                 labelTwo="Monthly"

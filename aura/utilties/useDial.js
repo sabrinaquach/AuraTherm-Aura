@@ -9,7 +9,6 @@ import {
   strokePosition,
 } from "./dialMath";
 
-// keep angles continuous relative to a reference
 function normalizeToNear(t, ref) {
   'worklet';
   const TAU = Math.PI * 2;
@@ -33,14 +32,13 @@ export function useDial(cfg = {}) {
     onChange,
     onChangeEnd,
 
-    // feel
     smoothK = 0.22,
     minDragDistance = 8,
     flingBoost = 0.06,
 
-    // mirroring
-    mirrorX = true,           // visual flip is handled in component; we also mirror touch
-    mirrorMode = "full",      // 'full' = match mirrored arc; 'visual' = old feel
+    //mirror
+    mirrorX = true,           //flip
+    mirrorMode = "full",  
   } = cfg;
 
   const [internal, setInternal] = useState(value ?? defaultValue);
@@ -69,8 +67,8 @@ export function useDial(cfg = {}) {
   const [isDragging, setIsDragging] = useState(false);
 
   const pan = useMemo(() => {
-    let tPrev = angle;   // smoothed ref angle
-    let angleOffset = 0; // prevents jump on grab
+    let tPrev = angle; 
+    let angleOffset = 0; 
 
     const handle = (e, fire) => {
       "worklet";
@@ -118,7 +116,7 @@ export function useDial(cfg = {}) {
         const vy = e.velocityY ?? 0;
         const sint = Math.sin(tTouch);
         const cost = Math.cos(tTouch);
-        const vAngular = ((vx * -sint) + (vy * cost)) / Math.max(r, 1); // rad/s
+        const vAngular = ((vx * -sint) + (vy * cost)) / Math.max(r, 1);
         const tFling = t + vAngular * flingBoost;
         let vFling = valueForAngle(tFling, min, max, thetaMinDeg, thetaMaxDeg);
         if (mirrorX && mirrorMode === "visual") vFling = min + max - vFling;
