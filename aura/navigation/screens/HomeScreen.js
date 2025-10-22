@@ -1,4 +1,3 @@
-// HomeScreen.js  (additions marked with 🔹)
 import React, { useEffect, useState, useMemo } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Dimensions, TextInput, Button } from 'react-native';
 import { Feather } from '@expo/vector-icons';
