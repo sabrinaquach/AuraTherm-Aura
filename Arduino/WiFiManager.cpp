@@ -2,8 +2,8 @@
 #include <WiFi.h>
 
 //Hotspot
-const char* ssid = "Grike";
-const char* password = "ChickenWang1738";
+const char* ssid     = "rager";
+const char* password = "12345678";
 
 bool wifiConnected = false;
 unsigned long wifiStartTime = 0;
