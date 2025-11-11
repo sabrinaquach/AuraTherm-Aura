@@ -1,124 +1,136 @@
-#include "ThermostatAPI.h"
+#include <Arduino.h>
 #include <Wire.h>
-#include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
-#include <ArduinoJson.h>   
+#include <WebServer.h>
 
-// Web server instance
+#include "ThermostatAPI.h"
+#include "DisplayUI.h"   // use the screen module (implemented in DisplayUI.cpp)
+
+// ===== Globals =====
 WebServer server(80);
+Adafruit_BME280 bme;
+bool bmeInitialized = false;
 
-// BME280 instance
-Adafruit_BME280* bme = nullptr;
-#define BME_ADDRESS 0x76
+// Example thermostat state (replace with your real state if you have it)
+static float  targetTempF = 72.0f;
+static String hvacMode    = "Cooling";  // "Heating" / "Cooling" / "Idle"
 
-// Temperature variables
-float currentTemp = 0;    
-int targetTemp = 74;      // default target
+// ===== Helpers =====
+static inline float c_to_f(float c) { return c * 9.0f / 5.0f + 32.0f; }
 
-// Initialize BME280
+// ===== Sensor setup =====
 void temp_setup() {
-    Serial.println("Initializing BME280...");
-    Wire.begin(21, 22, 100000); // SDA, SCL
-    Wire.setClock(100000); // 100 kHz
-    delay(100); // give time for sensor to power up
+  // ESP32 I2C pins
+  Wire.begin(21, 22);
+  Wire.setClock(100000);
 
-    bme = new Adafruit_BME280();
+  // Try both addresses
+  if (bme.begin(0x76, &Wire) || bme.begin(0x77, &Wire)) {
+    bmeInitialized = true;
 
-    if (!bme->begin(BME_ADDRESS)) {
-        Serial.println("BME280 not detected! Check wiring.");
-    } else {
-        Serial.print("Detected sensor ID: 0x");
-        Serial.println(bme->sensorID(), HEX);
-        Serial.println("BME280 initialized successfully!");
+    // Optional sampling config
+    bme.setSampling(
+      Adafruit_BME280::MODE_NORMAL,
+      Adafruit_BME280::SAMPLING_X1,   // temp
+      Adafruit_BME280::SAMPLING_X1,   // pressure
+      Adafruit_BME280::SAMPLING_X1,   // humidity
+      Adafruit_BME280::FILTER_OFF,
+      Adafruit_BME280::STANDBY_MS_0_5
+    );
+
+    Serial.println(F("[BME280] Initialized"));
+  } else {
+    Serial.println(F("[BME280] NOT found on 0x76/0x77"));
+  }
+}
+
+// ===== Tiny JSON helpers (no ArduinoJson needed) =====
+static String jsonKV(const char* k, const String& v, bool last=false) {
+  String s = "\""; s += k; s += "\":\""; s += v; s += "\"";
+  if (!last) s += ",";
+  return s;
+}
+
+static String jsonKV(const char* k, float v, bool last=false, uint8_t digits=1) {
+  String s = "\""; 
+  s += k; 
+  s += "\":";
+  // Force the correct String() overload: (double, unsigned int)
+  s += String((double)v, (unsigned int)digits);
+  if (!last) s += ",";
+  return s;
+}
+
+// ===== /status handler =====
+static void handleStatus() {
+  float tempF, hum, p_hPa, alt_m, tgtF;
+  String mode;
+
+  bool ok = api_getSnapshot(tempF, hum, p_hPa, alt_m, tgtF, mode);
+
+  String out = "{";
+  if (ok) {
+    out += jsonKV("currentTemp", tempF);
+    out += jsonKV("humidity",    hum);
+    out += jsonKV("pressure",    p_hPa, false, 1);
+    out += jsonKV("altitude",    alt_m,  false, 1);
+    out += jsonKV("targetTemp",  tgtF);
+    out += jsonKV("mode",        mode,   true);
+  } else {
+    out += jsonKV("error", "sensor_unavailable", true);
+  }
+  out += "}";
+
+  // (Optional) update OLED on each /status hit so API & screen match
+  if (ok && display_ok()) {
+    display_update(tempF, hum, p_hPa, alt_m, tgtF, mode);
+  }
+
+  server.send(200, "application/json", out);
+}
+
+// ===== /i2c-scan (handy for debugging) =====
+static void handleI2CScan() {
+  byte count = 0;
+  String out = "[";
+  for (byte address = 1; address < 127; address++) {
+    Wire.beginTransmission(address);
+    if (Wire.endTransmission() == 0) {
+      if (count++) out += ",";
+      out += "\"0x" + String(address, HEX) + "\"";
     }
+  }
+  out += "]";
+  server.send(200, "application/json", out);
 }
 
-// Read sensor and convert to Fahrenheit
-void updateCurrentTemp() {
-    if (bme) {
-        float tC = bme->readTemperature();
-        if (!isnan(tC)) {
-            currentTemp = (tC * 9.0 / 5.0) + 32.0;
-        } else {
-            Serial.println("Temperature read failed (NaN)");
-        }
-    }
-}
-
-// API handler for /status
-void handleStatus() {
-    updateCurrentTemp(); // always read before responding
-
-    StaticJsonDocument<200> doc;
-    doc["currentTemp"] = currentTemp;
-    doc["targetTemp"] = targetTemp;
-    //doc["currentTemp"] = 72; //static values to test if app can read
-    //doc["targetTemp"] = 74;
-    doc["mode"] = "cooling";
-    doc["motion"] = true;
-
-    String output;
-    serializeJson(doc, output);
-    server.send(200, "application/json", output);
-}
-
-// Setup server
+// ===== Server setup =====
 void setupAPI() {
-    server.on("/status", HTTP_GET, handleStatus);
-    server.begin();
-    Serial.println("HTTP server started");
+  server.on("/status",   HTTP_GET, handleStatus);
+  server.on("/i2c-scan", HTTP_GET, handleI2CScan);
+  server.begin();
+  Serial.println(F("[HTTP] server started"));
 }
 
+// ===== Public snapshot for OLED / dashboard callers =====
+bool api_getSnapshot(float& tempF, float& humidity_pct, float& pressure_hPa,
+                     float& altitude_m, float& targetF, String& mode)
+{
+  if (!bmeInitialized) return false;
 
+  float tC = bme.readTemperature();
+  float h  = bme.readHumidity();
+  float p  = bme.readPressure();             // Pa
+  float a  = bme.readAltitude(1013.25f);     // m
 
+  if (isnan(tC) || isnan(h) || isnan(p) || isnan(a)) return false;
 
+  tempF        = c_to_f(tC);
+  humidity_pct = h;
+  pressure_hPa = p / 100.0f;
+  altitude_m   = a;
 
-
-
-
-
-
-
-//pseudo code for dynamic vars
-//update app -> update hardware
-// #include "ThermostatAPI.h"
-// #include <ArduinoJson.h>
-// #include <WebServer.h>
-
-// WebServer server(80); // already declared globally in ThermostatAPI.h
-
-// int currentTemp = 72;
-// int targetTemp = 74;
-
-// void handleStatus() {
-//     StaticJsonDocument<200> doc;
-//     doc["currentTemp"] = currentTemp;
-//     doc["targetTemp"] = targetTemp;
-//     doc["mode"] = "cooling";
-    
-//     String output;
-//     serializeJson(doc, output);
-//     server.send(200, "application/json", output);
-// }
-
-// void handleSetTemp() {
-//     if (server.hasArg("plain") == false) {
-//         server.send(400, "text/plain", "Body not received");
-//         return;
-//     }
-//     StaticJsonDocument<200> doc;
-//     DeserializationError error = deserializeJson(doc, server.arg("plain"));
-//     if (error) {
-//         server.send(400, "text/plain", "JSON parse error");
-//         return;
-//     }
-//     targetTemp = doc["targetTemp"];  // update global variable
-//     server.send(200, "application/json", "{\"status\":\"ok\"}");
-// }
-
-// void setupAPI() {
-//     server.on("/status", HTTP_GET, handleStatus);
-//     server.on("/set-temp", HTTP_POST, handleSetTemp);
-//     server.begin();
-//     Serial.println("HTTP server started");
-// }
+  targetF = targetTempF;
+  mode    = hvacMode;
+  return true;
+}
