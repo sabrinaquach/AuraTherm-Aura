@@ -117,7 +117,7 @@ export default function HomeScreen({ navigation }) {
   const disabled = occupiedOptions.length === 0;
 
   return (
-    <View style={styles.container}>
+    <View style={MainScreensStyle.container}>
       {/* occupied room dropdown */}
       <View style={styles.header}>
         <Dropdown
