@@ -1,69 +1,29 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Dimensions, TextInput, Button } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Dimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { Dropdown } from 'react-native-element-dropdown';                 // 🔹 add
-import { createClient } from '@supabase/supabase-js';        
+import { Dropdown } from 'react-native-element-dropdown';        
 import supabase from '../../auth/client';            
 import MainScreensStyle from '../../style/MainScreenStyles';
 import useThermostatStatus from '../../utilties/useThermostatStatus';
 import usePreferences from '../../utilties/usePreferences';
 import ThermostatDial from '../../component/thermostat dial/halfCircleDial';
 
-
 const { width: W, height: H } = Dimensions.get('window');
 const SIZE = Math.min(W, H) * 2;
 
-function getDialColor(mode) {
-  const m = (mode || '').toString().trim().toLowerCase();
-  switch (m) {
-    case 'cool':
-    case 'cooling':  return '#00BFFF';
-    case 'heat':
-    case 'heating':  return '#FF8C00';
-    case 'off':
-    default:         return '#A3C858FF';
-  }
+function getTempBehaviorColor(current, target) {
+  if (current == null || target == null) return '#A3C858FF';
+
+  const c = Number(current);
+  const t = Number(target);
+
+  if (t > c) return '#FF8C00';
+  if (t < c) return '#00BFFF';
+
+  return '#A3C858FF';
 }
 
-// function nestColorForTemp(temp) {
-//   // Nest-like ranges (Fahrenheit):
-//   //  < 68°F  → blue
-//   //  68–75°F → neutral / greenish
-//   //  > 75°F  → orange/red
-  
-//   if (temp <= 68) {
-//     // BLUE range
-//     return interpolateColor(temp, 50, 68, 
-//       [0, 122, 255],   // deep cool blue
-//       [102, 204, 255]  // lighter sky blue
-//     );
-//   }
-  
-//   if (temp <= 75) {
-//     // NEUTRAL range
-//     return interpolateColor(temp, 68, 75, 
-//       [190, 255, 190], // mint-ish (Nest's soft green)
-//       [255, 255, 255]  // white
-//     );
-//   }
-  
-//   // HOT range
-//   return interpolateColor(temp, 75, 90,
-//     [255, 165, 0],    // orange
-//     [255, 69, 0]      // red-orange (Nest heating)
-//   );
-// }
-
-function interpolateColor(value, min, max, rgbStart, rgbEnd) {
-  const t = Math.min(1, Math.max(0, (value - min) / (max - min)));
-  const r = Math.round(rgbStart[0] + (rgbEnd[0] - rgbStart[0]) * t);
-  const g = Math.round(rgbStart[1] + (rgbEnd[1] - rgbStart[1]) * t);
-  const b = Math.round(rgbStart[2] + (rgbEnd[2] - rgbStart[2]) * t);
-  return `rgb(${r}, ${g}, ${b})`;
-}
-
-
-export default function HomeScreen({ navigation }) {
+export default function HomeScreen({ }) {
   const { data: status, loading: statusLoading, error: statusError, setTargetTempOnESP } = useThermostatStatus();
   const { tempUnit, loading: prefsLoading } = usePreferences();
 
@@ -112,7 +72,6 @@ export default function HomeScreen({ navigation }) {
   const selectedRoomLabel =
     occupiedOptions.find(o => o.value === selectedRoomId)?.label || 'Living Room';
 
-
   const loading = statusLoading || prefsLoading || roomsLoading;
 
   const targetTemp  = status?.targetTemp ?? null;
@@ -121,13 +80,12 @@ export default function HomeScreen({ navigation }) {
   const mode        = status?.mode ?? 'off';
   
   const [uiTemp, setUiTemp] = useState(status?.targetTemp ?? 70);
-  const dialColor = getDialColor(mode);
-  
+  const dialColor = getTempBehaviorColor(currentTemp, uiTemp);
+
   console.log("temp:", uiTemp, "→ dialColor:", dialColor);
   console.log("🔥 RAW MODE:", status?.mode);
   console.log("🔥 CLEANED MODE:", (status?.mode || "").trim().toLowerCase());
   console.log("🔥 dialColor:", dialColor);
-
 
   //display temp
   const formatTemp = (v) => {

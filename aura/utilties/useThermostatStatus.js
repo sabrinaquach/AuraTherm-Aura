@@ -5,24 +5,44 @@ export default function useThermostatStatus() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const ESP_IP = "http://172.20.10.11"; 
+
+  //get status from ESP
   useEffect(() => {
     let mounted = true;
+
     (async () => {
       try {
-        await new Promise(r => setTimeout(r, 250));
-        if (!mounted) return;
-        setData({ targetTemp: 70, currentTemp: 72, mode: "off" });
+        const res = await fetch(`${ESP_IP}/status`);
+        const json = await res.json();
+
+        if (mounted) {
+          setData(json);
+        }
       } catch (e) {
-        setError(e);
+        if (mounted) setError(e);
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     })();
+
     return () => { mounted = false; };
   }, []);
 
+  //send temp to ESP
   const setTargetTempOnESP = useCallback(async (v) => {
-    setData(prev => prev ? { ...prev, targetTemp: v } : { targetTemp: v, currentTemp: v, mode: "off" });
+    try {
+      await fetch(`${ESP_IP}/setTemp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ temp: v })
+      });
+
+      //update app
+      setData(prev => prev ? { ...prev, targetTemp: v } : { targetTemp: v });
+    } catch (err) {
+      console.warn("Failed to send temp to ESP:", err);
+    }
   }, []);
 
   return { data, loading, error, setTargetTempOnESP };
