@@ -1,25 +1,22 @@
-#ifndef THERMOSTATAPI_H
-#define THERMOSTATAPI_H
-
+#pragma once
 #include <Arduino.h>
-#include <Adafruit_Sensor.h>
-#include <Adafruit_BME280.h>
-#include <Wire.h>
 #include <WebServer.h>
+#include <Adafruit_BME280.h>
 
-// Web server
+// ===== Globals provided by ThermostatAPI.cpp =====
 extern WebServer server;
+extern Adafruit_BME280 bme;
+extern bool bmeInitialized;
 
-// Temperature sensor
-extern Adafruit_BME280* bme;
-extern float currentTemp;
-extern int targetTemp;
+extern float targetTempF;
+extern String hvacMode;
 
-// Functions
-void setupAPI();
-void handleStatus();
-void handleSetTemp();
-void updateCurrentTemp();
-void temp_setup();
+// ===== Setup / API =====
+void temp_setup();   // init BME280 (I2C on SDA=21, SCL=22)
+void setupAPI();     // register HTTP routes (/status, /i2c-scan)
 
-#endif
+// ===== Snapshot for UI (OLED / dashboard callers) =====
+// Returns latest readings. (°F, %, hPa, m, °F, mode)
+// Returns true if values are valid.
+bool api_getSnapshot(float& tempF, float& humidity_pct, float& pressure_hPa,
+                     float& altitude_m, float& targetF, String& mode);
