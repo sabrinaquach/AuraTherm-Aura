@@ -121,14 +121,9 @@ export default function HomeScreen({ navigation }) {
   const mode        = status?.mode ?? 'off';
   
   const [uiTemp, setUiTemp] = useState(status?.targetTemp ?? 70);
-  
-  // MUST COME AFTER uiTemp is defined
   const dialColor = getDialColor(mode);
   
-  console.log("MODE:", mode, "→ dialColor:", dialColor);
-  
-  
-
+  console.log("temp:", uiTemp, "→ dialColor:", dialColor);
   console.log("🔥 RAW MODE:", status?.mode);
   console.log("🔥 CLEANED MODE:", (status?.mode || "").trim().toLowerCase());
   console.log("🔥 dialColor:", dialColor);
