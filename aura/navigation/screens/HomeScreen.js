@@ -83,9 +83,9 @@ export default function HomeScreen({ }) {
   const dialColor = getTempBehaviorColor(currentTemp, uiTemp);
 
   console.log("temp:", uiTemp, "→ dialColor:", dialColor);
-  console.log("🔥 RAW MODE:", status?.mode);
-  console.log("🔥 CLEANED MODE:", (status?.mode || "").trim().toLowerCase());
-  console.log("🔥 dialColor:", dialColor);
+  console.log("RAW MODE:", status?.mode);
+  console.log("CLEANED MODE:", (status?.mode || "").trim().toLowerCase());
+  console.log("dialColor:", dialColor);
 
   //display temp
   const formatTemp = (v) => {
