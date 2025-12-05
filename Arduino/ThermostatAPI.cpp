@@ -10,6 +10,7 @@
 WebServer server(80);
 Adafruit_BME280 bme;
 bool bmeInitialized = false;
+bool motionEnabled = true;
 
 // Example thermostat state (replace with your real state if you have it)
 float  targetTempF = 72.0f;
@@ -73,6 +74,10 @@ static void handleStatus() {
     out += jsonKV("currentTemp", tempF);
     out += jsonKV("targetTemp",  tgtF);
     out += jsonKV("mode",        mode,   true);
+
+    out += ",\"motionEnabled\":";
+    out += motionEnabled ? "true" : "false";
+
   } else {
     out += jsonKV("error", "sensor_unavailable", true);
   }
@@ -148,12 +153,27 @@ static void handleSet() {
   server.send(200, "application/json", "{\"status\":\"ok\"}");
 }
 
+static void handleMotionSet() {
+  if (!server.hasArg("plain")) {
+    server.send(400, "application/json", "{\"error\":\"no_body\"}");
+    return;
+  }
+
+  String body = server.arg("plain");
+
+  if (body.indexOf("true") >= 0)  motionEnabled = true;
+  if (body.indexOf("false") >= 0) motionEnabled = false;
+
+  server.send(200, "application/json", "{\"status\":\"ok\"}");
+}
+
 // ===== Server setup =====
 void setupAPI() {
   server.on("/status",   HTTP_GET, handleStatus);
   // server.on("/set",      HTTP_POST, handleSet);
   server.on("/set", HTTP_ANY, handleSet);
   server.on("/setTemp",  HTTP_POST, handleSet);
+  server.on("/motion/set", HTTP_POST, handleMotionSet);
   server.on("/i2c-scan", HTTP_GET, handleI2CScan);
   server.begin();
   Serial.println(F("[HTTP] server started"));
@@ -169,7 +189,7 @@ bool api_getSnapshot(float& tempF, float& targetF, String& mode)
   if (isnan(tC)) return false;
 
   tempF        = c_to_f(tC);
-  
+
   targetF = targetTempF;
 
   // If mode is the combined mode, choose heating or cooling dynamically
