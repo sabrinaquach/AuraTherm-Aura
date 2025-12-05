@@ -93,9 +93,8 @@ void loop() {
 
     float tempF, hum, p_hPa, alt_m, tgtF;
     String mode;
-    if (api_getSnapshot(tempF, hum, p_hPa, alt_m, tgtF, mode)) {
-      display_update(tempF, hum, p_hPa, alt_m, tgtF, mode);
-      // (Optional) you can extend display_update(...) to also show occ if desired
+    if (api_getSnapshot(tempF, tgtF, mode)) {
+      display_update(tempF, tgtF, mode);  
     }
   }
 
