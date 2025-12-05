@@ -105,6 +105,19 @@ static void handleI2CScan() {
 }
 
 static void handleSet() {
+  //debug
+  Serial.println("---- REQUEST DEBUG ----");
+  Serial.println("Method: " + String(server.method()));
+  Serial.println("Args count: " + String(server.args()));
+
+  for (int i = 0; i < server.args(); i++) {
+    Serial.println(server.argName(i) + " = " + server.arg(i));
+  }
+
+  String rawBody = server.arg("plain");
+  Serial.println("RAW BODY: [" + rawBody + "]");
+  Serial.println("-----------------------");
+  
   if (!server.hasArg("plain")) {
     server.send(400, "application/json", "{\"error\":\"no_body\"}");
     return;
@@ -113,34 +126,24 @@ static void handleSet() {
   String body = server.arg("plain");
   Serial.println("[API] Incoming JSON: " + body);
 
-  // // crude JSON parsing (no ArduinoJson library required)
-  // int tIdx = body.indexOf("targetTemp");
-  // if (tIdx >= 0) {
-  //   int colon = body.indexOf(":", tIdx);
-  //   int comma = body.indexOf(",", colon);
-  //   if (comma < 0) comma = body.indexOf("}", colon);
-  //   targetTempF = body.substring(colon + 1, comma).toFloat();
-  //   Serial.println("Updated targetTempF: " + String(targetTempF));
-  // }
-
-  // accept /setTemp POST like React expects
-  server.on("/setTemp", HTTP_POST, handleSet);
-
-  // inside handleSet, parse "temp" instead of "targetTemp"
-  int tIdx = body.indexOf("temp");  // previously "targetTemp"
+  // Parse "targetTemp" (match your React app!)
+  int tIdx = body.indexOf("targetTemp");
   if (tIdx >= 0) {
-      int colon = body.indexOf(":", tIdx);
-     int comma = body.indexOf(",", colon);
-      if (comma < 0) comma = body.indexOf("}", colon);
-      targetTempF = body.substring(colon + 1, comma).toFloat();
-      Serial.println("Updated targetTempF: " + String(targetTempF));  
+    int colon = body.indexOf(":", tIdx);
+    int comma = body.indexOf(",", colon);
+    if (comma < 0) comma = body.indexOf("}", colon);
+
+    targetTempF = body.substring(colon + 1, comma).toFloat();
+    Serial.println("Updated targetTempF: " + String(targetTempF));
   }
 
+  // Parse mode if included
   int mIdx = body.indexOf("mode");
   if (mIdx >= 0) {
-    int colon = body.indexOf(":", mIdx);
+    int colon  = body.indexOf(":", mIdx);
     int quote1 = body.indexOf("\"", colon + 1);
     int quote2 = body.indexOf("\"", quote1 + 1);
+
     hvacMode = body.substring(quote1 + 1, quote2);
     Serial.println("Updated hvacMode: " + hvacMode);
   }
@@ -151,7 +154,9 @@ static void handleSet() {
 // ===== Server setup =====
 void setupAPI() {
   server.on("/status",   HTTP_GET, handleStatus);
-  server.on("/set",      HTTP_POST, handleSet);
+  // server.on("/set",      HTTP_POST, handleSet);
+  server.on("/set", HTTP_ANY, handleSet);
+  server.on("/setTemp",  HTTP_POST, handleSet);
   server.on("/i2c-scan", HTTP_GET, handleI2CScan);
   server.begin();
   Serial.println(F("[HTTP] server started"));
