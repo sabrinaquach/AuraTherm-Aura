@@ -13,7 +13,7 @@ bool bmeInitialized = false;
 
 // Example thermostat state (replace with your real state if you have it)
 float  targetTempF = 72.0f;
-String hvacMode    = "Cooling";  // "Heating" / "Cooling" / "Off"
+String hvacMode    = "Off";  // "Heating" / "Cooling" / "Off"
 
 // ===== Helpers =====
 static inline float c_to_f(float c) { return c * 9.0f / 5.0f + 32.0f; }
@@ -63,17 +63,14 @@ static String jsonKV(const char* k, float v, bool last=false, uint8_t digits=1) 
 
 // ===== /status handler =====
 static void handleStatus() {
-  float tempF, hum, p_hPa, alt_m, tgtF;
+  float tempF, tgtF;
   String mode;
 
-  bool ok = api_getSnapshot(tempF, hum, p_hPa, alt_m, tgtF, mode);
+  bool ok = api_getSnapshot(tempF, tgtF, mode);
 
   String out = "{";
   if (ok) {
     out += jsonKV("currentTemp", tempF);
-    out += jsonKV("humidity",    hum);
-    out += jsonKV("pressure",    p_hPa, false, 1);
-    out += jsonKV("altitude",    alt_m,  false, 1);
     out += jsonKV("targetTemp",  tgtF);
     out += jsonKV("mode",        mode,   true);
   } else {
@@ -83,7 +80,7 @@ static void handleStatus() {
 
   // (Optional) update OLED on each /status hit so API & screen match
   if (ok && display_ok()) {
-    display_update(tempF, hum, p_hPa, alt_m, tgtF, mode);
+    display_update(tempF, tgtF, mode);
   }
 
   server.send(200, "application/json", out);
@@ -163,24 +160,31 @@ void setupAPI() {
 }
 
 // ===== Public snapshot for OLED / dashboard callers =====
-bool api_getSnapshot(float& tempF, float& humidity_pct, float& pressure_hPa,
-                     float& altitude_m, float& targetF, String& mode)
+bool api_getSnapshot(float& tempF, float& targetF, String& mode)
 {
   if (!bmeInitialized) return false;
 
   float tC = bme.readTemperature();
-  float h  = bme.readHumidity();
-  float p  = bme.readPressure();             // Pa
-  float a  = bme.readAltitude(1013.25f);     // m
 
-  if (isnan(tC) || isnan(h) || isnan(p) || isnan(a)) return false;
+  if (isnan(tC)) return false;
 
   tempF        = c_to_f(tC);
-  humidity_pct = h;
-  pressure_hPa = p / 100.0f;
-  altitude_m   = a;
-
+  
   targetF = targetTempF;
-  mode    = hvacMode;
+
+  // If mode is the combined mode, choose heating or cooling dynamically
+  if (hvacMode == "Heating/Cooling") {
+      if (tempF < targetTempF) {
+          mode = "Heat";
+      } else if (tempF > targetTempF) {
+          mode = "Cool";
+      } else {
+          mode = "Off"; // or idle
+      }
+  } else {
+      // Otherwise use the set mode directly
+      mode = hvacMode;
+  }
+
   return true;
 }
