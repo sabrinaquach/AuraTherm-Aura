@@ -34,9 +34,6 @@ void display_init(uint8_t addr) {
 bool display_ok() { return g_display_ok; }
 
 void display_update(float tempF,
-                    float humidity_pct,
-                    float pressure_hPa,
-                    float altitude_m,
                     float targetF,
                     const String& mode) {
   if (!g_display_ok) return;
@@ -44,35 +41,27 @@ void display_update(float tempF,
   display.clearDisplay();
   display.setTextColor(SSD1306_WHITE);
 
-  // Big temperature (centered)
-  char tbuf[24];
+  // TOP CENTER: Current temperature (big)
+  char tbuf[16];
   snprintf(tbuf, sizeof(tbuf), "%.1f F", tempF);
-  drawCenteredText(String(tbuf), 0, 2);
+  drawCenteredText(String(tbuf), 6, 2); 
 
-  // Row: Humidity / Pressure
-  display.setTextSize(1);
-  display.setCursor(0, 30);
-  display.print("Hum: ");
-  display.print(humidity_pct, 1);
-  display.print(" %");
-
-  display.setCursor(64, 30);
-  display.print("Pres: ");
-  display.print(pressure_hPa, 0);
-  display.print(" hPa");
-
-  // Row: Alt / Set / Mode
-  display.setCursor(0, 44);
-  display.print("Alt: ");
-  display.print(altitude_m, 0);
-  display.print(" m");
-
-  display.setCursor(0, 56);
+  // BOTTOM LEFT: Set temp
+  display.setTextSize(1.2);
+  display.setCursor(0, SCREEN_HEIGHT - 10);   // bottom
   display.print("Set: ");
   display.print(targetF, 0);
-  display.print("F  ");
-  display.print("Mode: ");
-  display.print(mode);
+  display.print("F");
+
+  // BOTTOM RIGHT: Mode
+  String modeStr = "Mode: " + mode;
+
+  int16_t x1, y1; 
+  uint16_t w, h;
+  display.getTextBounds(modeStr, 0, 0, &x1, &y1, &w, &h);
+
+  display.setCursor(SCREEN_WIDTH - w, SCREEN_HEIGHT - 10);
+  display.print(modeStr);
 
   display.display();
 }

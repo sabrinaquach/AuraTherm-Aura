@@ -6,9 +6,6 @@ void display_init(uint8_t addr = 0x3C);
 
 // Update the screen with new readings (pass °F for temps, hPa, m).
 void display_update(float tempF,
-                    float humidity_pct,
-                    float pressure_hPa,
-                    float altitude_m,
                     float targetF,
                     const String& mode);
 
