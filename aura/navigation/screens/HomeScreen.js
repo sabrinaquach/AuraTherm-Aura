@@ -122,7 +122,7 @@ export default function HomeScreen({ }) {
   console.log("RAW MODE:", status?.mode);
   console.log("CLEANED MODE:", (status?.mode || "").trim().toLowerCase());
 
-  const motionEnabled = status?.motionEnabled === "true";
+  const motionEnabled = status?.motionEnabled == true;
 
   //display temp
   const formatTemp = (v) => {
