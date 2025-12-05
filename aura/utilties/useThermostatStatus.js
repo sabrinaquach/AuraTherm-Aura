@@ -86,6 +86,5 @@ export default function useThermostatStatus() {
     }
   }, []);
   
-
   return { data, loading, error, setTargetTempOnESP, setModeOnESP, setMotionOnESP };
 }
