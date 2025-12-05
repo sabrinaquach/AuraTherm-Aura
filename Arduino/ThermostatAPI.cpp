@@ -113,14 +113,27 @@ static void handleSet() {
   String body = server.arg("plain");
   Serial.println("[API] Incoming JSON: " + body);
 
-  // crude JSON parsing (no ArduinoJson library required)
-  int tIdx = body.indexOf("targetTemp");
+  // // crude JSON parsing (no ArduinoJson library required)
+  // int tIdx = body.indexOf("targetTemp");
+  // if (tIdx >= 0) {
+  //   int colon = body.indexOf(":", tIdx);
+  //   int comma = body.indexOf(",", colon);
+  //   if (comma < 0) comma = body.indexOf("}", colon);
+  //   targetTempF = body.substring(colon + 1, comma).toFloat();
+  //   Serial.println("Updated targetTempF: " + String(targetTempF));
+  // }
+
+  // accept /setTemp POST like React expects
+  server.on("/setTemp", HTTP_POST, handleSet);
+
+  // inside handleSet, parse "temp" instead of "targetTemp"
+  int tIdx = body.indexOf("temp");  // previously "targetTemp"
   if (tIdx >= 0) {
-    int colon = body.indexOf(":", tIdx);
-    int comma = body.indexOf(",", colon);
-    if (comma < 0) comma = body.indexOf("}", colon);
-    targetTempF = body.substring(colon + 1, comma).toFloat();
-    Serial.println("Updated targetTempF: " + String(targetTempF));
+      int colon = body.indexOf(":", tIdx);
+     int comma = body.indexOf(",", colon);
+      if (comma < 0) comma = body.indexOf("}", colon);
+      targetTempF = body.substring(colon + 1, comma).toFloat();
+      Serial.println("Updated targetTempF: " + String(targetTempF));  
   }
 
   int mIdx = body.indexOf("mode");
