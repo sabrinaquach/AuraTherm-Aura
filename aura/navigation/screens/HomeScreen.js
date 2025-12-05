@@ -146,7 +146,10 @@ export default function HomeScreen({ }) {
         min={50}
         max={90}
         onChange={setUiTemp}
-        onChangeEnd={commitTemp}   
+        onChangeEnd={(v) => {
+          commitTemp(v);     
+          setTargetTempOnESP(v);  //send to ESP
+        }}         
         width={SIZE}
         height={SIZE}
         xShiftR={0.15}
