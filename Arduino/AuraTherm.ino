@@ -17,6 +17,7 @@ static uint32_t lastDbg  = 0;
 
 // 'server' lives in ThermostatAPI
 extern WebServer server;
+extern bool wifiConnected; 
 
 void setup() {
   Serial.begin(115200);
@@ -26,11 +27,14 @@ void setup() {
   // 1) Wi-Fi
   setupWiFi();
 
+  Serial.println("[AuraTherm] Waiting for Wi-Fi...");
+  
   // 2) Sensors (BME280 on I2C: SDA=21, SCL=22)
   temp_setup();
 
   // 3) HTTP API (/status, /i2c-scan, etc.)
   setupAPI();
+  
 
   // 3a) Add /motion endpoint -> {"motion_detected":true/false}
   server.on("/motion", HTTP_GET, []() {
@@ -52,8 +56,10 @@ void setup() {
 }
 
 void loop() {
-  //checkWiFi();
-  //server.handleClient();
+  uint32_t now = millis();
+  checkWiFi();
+
+  server.handleClient();
 
   // --- PIR update & prints ---
   pir.update();
@@ -72,7 +78,7 @@ void loop() {
   }
 
   // 1s heartbeat (also shows raw pin state)
-  uint32_t now = millis();
+  //uint32_t now = millis();
   if (now - lastDbg >= 1000) {
     lastDbg = now;
     int raw = digitalRead(PIR_GPIO);
@@ -95,3 +101,4 @@ void loop() {
 
   delay(5);
 }
+
