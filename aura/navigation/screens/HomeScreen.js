@@ -168,6 +168,7 @@ export default function HomeScreen({ }) {
           <Text style={styles.label}>Failed to load status.</Text>
         ) : (
           <>
+            <Text style={styles.tempStatusText}>{status?.mode}</Text>
             <Text style={styles.tempDisplayText}>{formatTemp(uiTemp)}</Text>
             <Text style={styles.label}>Current Temp {formatTemp(currentTemp)}°{unitSuffix}</Text>
 
@@ -218,6 +219,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center', 
     zIndex: 1,
   },
+  tempStatusText: {
+    fontFamily: 'Inter', 
+    color: '#000', 
+    fontSize: 16,
+    fontWeight: '500',
+  },
   tempDisplayText: {
     color: '#000', 
     fontFamily: 'Inter', 
@@ -225,16 +232,26 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   label: { 
-    fontSize: 15,
+    fontSize: 16,
     marginTop: 8 
   },
   humidityRow: { 
     flexDirection: 'row', 
     gap: 3, 
-    alignItems: 'center' 
+    alignItems: 'center' ,
   },
   humidity_percentRow: { 
     flexDirection: 'row', 
-    gap: 25 
+    gap: 25,
   },
+  humidityText: {
+    fontFamily: 'Inter', 
+    color: '#000', 
+    fontSize: 16,
+  },
+  humidityPercent: {
+    fontFamily: 'Inter', 
+    color: '#000', 
+    fontSize: 16,
+  }
 });
