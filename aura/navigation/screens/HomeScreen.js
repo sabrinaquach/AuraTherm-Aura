@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Dimensions, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { Dropdown } from 'react-native-element-dropdown';        
 import supabase from '../../auth/client';            
@@ -7,6 +7,8 @@ import MainScreensStyle from '../../style/MainScreenStyles';
 import useThermostatStatus from '../../utilties/useThermostatStatus';
 import usePreferences from '../../utilties/usePreferences';
 import ThermostatDial from '../../component/thermostat dial/halfCircleDial';
+import HomeControlTab from '../../component/homeControlTab';
+import ModeSelectModal from '../../component/ModeSelectModal';
 
 const { width: W, height: H } = Dimensions.get('window');
 const SIZE = Math.min(W, H) * 2;
@@ -23,8 +25,23 @@ function getTempBehaviorColor(current, target) {
   return '#A3C858FF';
 }
 
+function getModeColor(mode) {
+  const m = (mode || "").toLowerCase();
+  if (m === "heating" || m === "heat") return "#FF8C00";   //orange
+  if (m === "cooling" || m === "cool") return "#00BFFF";   //blue
+  return "#A3C858FF";                                      //green (off)
+}
+
+function getDisplayMode(mode) {
+  const m = (mode || "").toLowerCase();
+
+  if (m === "heat" || m === "heating") return "Heating";
+  if (m === "cool" || m === "cooling") return "Cooling";
+  return ""; //off, display nothing
+}
+
 export default function HomeScreen({ }) {
-  const { data: status, loading: statusLoading, error: statusError, setTargetTempOnESP } = useThermostatStatus();
+  const { data: status, loading: statusLoading, error: statusError, setTargetTempOnESP, setModeOnESP, setMotionOnESP } = useThermostatStatus();
   const { tempUnit, loading: prefsLoading } = usePreferences();
 
   //occupied rooms state 
@@ -72,6 +89,25 @@ export default function HomeScreen({ }) {
   const selectedRoomLabel =
     occupiedOptions.find(o => o.value === selectedRoomId)?.label || 'Living Room';
 
+  // Auto-select a valid room whenever occupancy changes
+  useEffect(() => {
+    if (occupiedOptions.length === 0) {
+      setSelectedRoomId(null);
+      return;
+    }
+
+    const stillExists = occupiedOptions.some(r => r.value === selectedRoomId);
+    
+    if (!stillExists) {
+      // Select first occupied room
+      setSelectedRoomId(occupiedOptions[0].value);
+    }
+  }, [occupiedOptions]);
+
+  const tabLabels = occupiedOptions.map(o => o.label);
+  const selectedIndex = occupiedOptions.findIndex(o => o.value === selectedRoomId);
+  
+
   const loading = statusLoading || prefsLoading || roomsLoading;
 
   const targetTemp  = status?.targetTemp ?? null;
@@ -80,12 +116,13 @@ export default function HomeScreen({ }) {
   const mode        = status?.mode ?? 'off';
   
   const [uiTemp, setUiTemp] = useState(status?.targetTemp ?? 70);
-  const dialColor = getTempBehaviorColor(currentTemp, uiTemp);
+  const dialColor = getModeColor(status?.mode);
 
   console.log("temp:", uiTemp, "→ dialColor:", dialColor);
   console.log("RAW MODE:", status?.mode);
   console.log("CLEANED MODE:", (status?.mode || "").trim().toLowerCase());
-  console.log("dialColor:", dialColor);
+
+  const motionEnabled = status?.motionEnabled === "true";
 
   //display temp
   const formatTemp = (v) => {
@@ -118,10 +155,20 @@ export default function HomeScreen({ }) {
 
   const disabled = occupiedOptions.length === 0;
 
+  const [modeModalVisible, setModeModalVisible] = useState(false);
+
   return (
     <View style={MainScreensStyle.container}>
       {/* occupied room dropdown */}
       <View style={styles.header}>
+        {/* <HomeControlTab
+          values={tabLabels}
+          selectedIndex={selectedIndex}
+          onSelect={(index) => {
+              const room = occupiedOptions[index];
+              if (room) setSelectedRoomId(room.value);
+          }}
+        /> */}
         <Dropdown
           data={occupiedOptions}
           labelField="label"
@@ -149,7 +196,7 @@ export default function HomeScreen({ }) {
         onChangeEnd={(v) => {
           commitTemp(v);     
           setTargetTempOnESP(v);  //send to ESP
-        }}         
+        }}
         width={SIZE}
         height={SIZE}
         xShiftR={0.15}
@@ -164,26 +211,58 @@ export default function HomeScreen({ }) {
         innerWidth={4}
       />
 
-      <View pointerEvents="none" style={styles.tempDisplay_container}>
-        {loading ? (
-          <ActivityIndicator />
-        ) : statusError ? (
-          <Text style={styles.label}>Failed to load status.</Text>
-        ) : (
-          <>
-            <Text style={styles.tempStatusText}>{status?.mode}</Text>
-            <Text style={styles.tempDisplayText}>{formatTemp(uiTemp)}</Text>
-            <Text style={styles.label}>Current Temp {formatTemp(currentTemp)}°{unitSuffix}</Text>
+      <View pointerEvents="box-none" style={styles.tempDisplay_container}>
+        <View pointerEvents="none">
+          {loading ? (
+            <ActivityIndicator />
+          ) : statusError ? (
+            <Text style={styles.label}>Failed to load status.</Text>
+          ) : (
+            <>
+              {status?.mode?.toLowerCase() !== "off" && (
+                <Text style={styles.tempStatusText}>
+                  {getDisplayMode(status?.mode)}
+                </Text>
+              )}
 
-            <View style={styles.humidityRow}>
-              <Feather name="droplet" />
-              <View style={styles.humidity_percentRow}>
-                <Text style={styles.humidityText}>Humidity</Text>
-                <Text style={styles.humidityPercent}>45%</Text>
-              </View>
-            </View>
-          </>
-        )}
+              <Text style={styles.tempDisplayText}>
+                {mode?.toLowerCase() === "off" ? "OFF" : formatTemp(uiTemp)}
+              </Text>
+
+              <Text style={styles.label}>Current Temp {formatTemp(currentTemp)}°{unitSuffix}</Text>
+            </>
+          )}
+        </View>
+
+        {/* Mode button */}
+        <TouchableOpacity
+          style={styles.modeButton}
+          onPress={() => setModeModalVisible(true)}
+        >
+        <Feather name="power" size={16} />
+        <Text style={styles.modeButtonText}>Mode</Text>
+        </TouchableOpacity>
+
+        <ModeSelectModal
+          visible={modeModalVisible}
+          onClose={() => setModeModalVisible(false)}
+          mode={status?.mode}
+          onSelect={(m) => setModeOnESP(m)}
+        />
+
+        {/* Motion button */}
+        <TouchableOpacity
+          style={[
+            styles.motionButton,
+            { backgroundColor: motionEnabled ? "#A3C858" : "#D9D9D9" }
+          ]}
+          onPress={() => setMotionOnESP(!motionEnabled)}
+        >
+          <Feather name="users" size={16} />
+          <Text style={styles.modeButtonText}>
+            {motionEnabled ? "Motion On" : "Motion Off"}
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -256,5 +335,19 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter', 
     color: '#000', 
     fontSize: 16,
+  },
+  modeButton: {
+    backgroundColor: '#D9D9D9',
+    width: 77,
+    height: 35,
+    display: 'flex',
+    flexDirection: 'row'
+  },
+  motionButton: {
+    backgroundColor: '#D9D9D9',
+    width: 77,
+    height: 35,
+    display: 'flex',
+    flexDirection: 'row'
   }
 });

@@ -52,5 +52,40 @@ export default function useThermostatStatus() {
     }
   }, []);
 
-  return { data, loading, error, setTargetTempOnESP };
+  //send mode status to ESP
+  const setModeOnESP = useCallback(async (newMode) => {
+    try {
+      await fetch(`${ESP_IP}/set`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode: newMode })
+      });
+  
+      // Update UI immediately
+      setData(prev => prev ? { ...prev, mode: newMode } : { mode: newMode });
+  
+    } catch (err) {
+      console.warn("Failed to send mode to ESP:", err);
+    }
+  }, []);
+  
+  //send motion status to ESP
+  const setMotionOnESP = useCallback(async (value) => {
+    try {
+      await fetch(`${ESP_IP}/motion/set`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ motion: value })
+      });
+  
+      setData(prev =>
+        prev ? { ...prev, motionEnabled: value } : { motionEnabled: value }
+      );
+    } catch (err) {
+      console.warn("Failed to send motion toggle:", err);
+    }
+  }, []);
+  
+
+  return { data, loading, error, setTargetTempOnESP, setModeOnESP, setMotionOnESP };
 }
