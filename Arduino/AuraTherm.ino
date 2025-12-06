@@ -53,6 +53,12 @@ void setup() {
   Serial.printf("[PIR] Using GPIO %u | warm-up %lus\n",
                 PIR_GPIO, PIR_WARMUP_MS / 1000);
 
+  //LED setup
+  pinMode(32, OUTPUT);  // Blue LED
+  pinMode(33, OUTPUT);  // Red LED
+  digitalWrite(32, LOW); // Blue LED off initially
+  digitalWrite(33, LOW); // Red LED off initially
+
   Serial.println("[AuraTherm] Ready.");
 }
 
@@ -90,6 +96,10 @@ void loop() {
           hvacMode = "Off";
       }
   }
+
+  // ===== LED control =====
+  digitalWrite(32, motionEnabled ? HIGH : LOW);
+  digitalWrite(33, (hvacMode == "Heat" || hvacMode == "Cool") ? HIGH : LOW);
 
 
   // -------- DEBUG HEARTBEAT --------
