@@ -4,7 +4,32 @@
 #include <WebServer.h>
 
 #include "ThermostatAPI.h"
-#include "DisplayUI.h"   // use the screen module (implemented in DisplayUI.cpp)
+#include "DisplayUI.h"
+
+// ===== History =====
+struct HistoryEvent {
+  String type;     
+  String timestamp;
+};
+
+HistoryEvent historyLog[50];  
+int historyIndex = 0;
+
+String timestamp() {
+  unsigned long ms = millis();
+  unsigned long sec = ms / 1000;
+  unsigned long min = sec / 60;
+  unsigned long hr  = min / 60;
+
+  char buffer[20];
+  sprintf(buffer, "%02lu:%02lu:%02lu", hr % 24, min % 60, sec % 60);
+  return String(buffer);
+}
+
+void pushHistory(String type) {
+  historyLog[historyIndex % 50] = { type, timestamp() };
+  historyIndex++;
+}
 
 // ===== Globals =====
 WebServer server(80);
@@ -12,7 +37,6 @@ Adafruit_BME280 bme;
 bool bmeInitialized = false;
 bool motionEnabled = true;
 
-//def
 float  targetTempF = 72.0f;
 String hvacMode    = "Off";  // "Heating" / "Cooling" / "Off"
 
@@ -29,6 +53,7 @@ void temp_setup() {
   if (bme.begin(0x76, &Wire) || bme.begin(0x77, &Wire)) {
     bmeInitialized = true;
 
+    // Optional sampling config
     bme.setSampling(
       Adafruit_BME280::MODE_NORMAL,
       Adafruit_BME280::SAMPLING_X1,   // temp
@@ -82,7 +107,7 @@ static void handleStatus() {
   }
   out += "}";
 
-  // update OLED on each /status hit so API & screen match
+  // (Optional) update OLED on each /status hit so API & screen match
   if (ok && display_ok()) {
     display_update(tempF, tgtF, mode);
   }
@@ -90,7 +115,7 @@ static void handleStatus() {
   server.send(200, "application/json", out);
 }
 
-// ===== /i2c-scan (handy for debugging) =====
+// ===== /i2c-scan  =====
 static void handleI2CScan() {
   byte count = 0;
   String out = "[";
@@ -105,51 +130,98 @@ static void handleI2CScan() {
   server.send(200, "application/json", out);
 }
 
-static void handleSet() {
-  //debug
-  Serial.println("---- REQUEST DEBUG ----");
-  Serial.println("Method: " + String(server.method()));
-  Serial.println("Args count: " + String(server.args()));
+// static void handleSet() {
+//   //debug
+//   Serial.println("---- REQUEST DEBUG ----");
+//   Serial.println("Method: " + String(server.method()));
+//   Serial.println("Args count: " + String(server.args()));
 
-  for (int i = 0; i < server.args(); i++) {
-    Serial.println(server.argName(i) + " = " + server.arg(i));
-  }
+//   for (int i = 0; i < server.args(); i++) {
+//     Serial.println(server.argName(i) + " = " + server.arg(i));
+//   }
 
-  String rawBody = server.arg("plain");
-  Serial.println("RAW BODY: [" + rawBody + "]");
-  Serial.println("-----------------------");
+//   String rawBody = server.arg("plain");
+//   Serial.println("RAW BODY: [" + rawBody + "]");
+//   Serial.println("-----------------------");
   
-  if (!server.hasArg("plain")) {
-    server.send(400, "application/json", "{\"error\":\"no_body\"}");
-    return;
-  }
+//   if (!server.hasArg("plain")) {
+//     server.send(400, "application/json", "{\"error\":\"no_body\"}");
+//     return;
+//   }
 
-  String body = server.arg("plain");
-  Serial.println("[API] Incoming JSON: " + body);
+//   String body = server.arg("plain");
+//   Serial.println("[API] Incoming JSON: " + body);
 
-  // Parse "targetTemp" (match app)
-  int tIdx = body.indexOf("targetTemp");
-  if (tIdx >= 0) {
-    int colon = body.indexOf(":", tIdx);
-    int comma = body.indexOf(",", colon);
-    if (comma < 0) comma = body.indexOf("}", colon);
+//   // Parse "targetTemp" (match your React app!)
+//   int tIdx = body.indexOf("targetTemp");
+//   if (tIdx >= 0) {
+//     int colon = body.indexOf(":", tIdx);
+//     int comma = body.indexOf(",", colon);
+//     if (comma < 0) comma = body.indexOf("}", colon);
 
-    targetTempF = body.substring(colon + 1, comma).toFloat();
-    Serial.println("Updated targetTempF: " + String(targetTempF));
-  }
+//     targetTempF = body.substring(colon + 1, comma).toFloat();
+//     Serial.println("Updated targetTempF: " + String(targetTempF));
+//   }
 
-  // Parse mode if included
-  int mIdx = body.indexOf("mode");
-  if (mIdx >= 0) {
-    int colon  = body.indexOf(":", mIdx);
-    int quote1 = body.indexOf("\"", colon + 1);
-    int quote2 = body.indexOf("\"", quote1 + 1);
+//   // Parse mode if included
+//   // int mIdx = body.indexOf("mode");
+//   // if (mIdx >= 0) {
+//   //   int colon  = body.indexOf(":", mIdx);
+//   //   int quote1 = body.indexOf("\"", colon + 1);
+//   //   int quote2 = body.indexOf("\"", quote1 + 1);
 
-    hvacMode = body.substring(quote1 + 1, quote2);
-    Serial.println("Updated hvacMode: " + hvacMode);
-  }
+//   //   hvacMode = body.substring(quote1 + 1, quote2);
+//   //   Serial.println("Updated hvacMode: " + hvacMode);
+//   // }
 
-  server.send(200, "application/json", "{\"status\":\"ok\"}");
+//   int mIdx = body.indexOf("mode");
+//   if (mIdx >= 0) {
+//     int colon  = body.indexOf(":", mIdx);
+//     int quote1 = body.indexOf("\"", colon + 1);
+//     int quote2 = body.indexOf("\"", quote1 + 1);
+
+//     String newMode = body.substring(quote1 + 1, quote2);
+    
+//     // Allow manual override anytime
+//     if (newMode == "Heat" || newMode == "Cool" || newMode == "Off") {
+//         hvacMode = newMode;
+//         Serial.println("Updated hvacMode: " + hvacMode);
+//     }
+//   }
+
+//   server.send(200, "application/json", "{\"status\":\"ok\"}");
+// }
+
+static void handleSet() {
+    if (!server.hasArg("plain")) {
+        server.send(400, "application/json", "{\"error\":\"no_body\"}");
+        return;
+    }
+
+    String body = server.arg("plain");
+    Serial.println("[API] Incoming JSON: " + body);
+
+    // Parse targetTemp
+    int tIdx = body.indexOf("targetTemp");
+    if (tIdx >= 0) {
+        int colon = body.indexOf(":", tIdx);
+        int comma = body.indexOf(",", colon);
+        if (comma < 0) comma = body.indexOf("}", colon);
+        targetTempF = body.substring(colon + 1, comma).toFloat();
+        Serial.println("Updated targetTempF: " + String(targetTempF));
+    }
+
+    // Parse hvacMode
+    int mIdx = body.indexOf("mode");
+    if (mIdx >= 0) {
+        int colon = body.indexOf(":", mIdx);
+        int quote1 = body.indexOf("\"", colon + 1);
+        int quote2 = body.indexOf("\"", quote1 + 1);
+        hvacMode = body.substring(quote1 + 1, quote2);
+        Serial.println("Updated hvacMode: " + hvacMode);
+    }
+
+    server.send(200, "application/json", "{\"status\":\"ok\"}");
 }
 
 static void handleMotionSet() {
@@ -159,21 +231,41 @@ static void handleMotionSet() {
   }
 
   String body = server.arg("plain");
+  Serial.println("[Motion] RAW: " + body);
 
   if (body.indexOf("true") >= 0)  motionEnabled = true;
   if (body.indexOf("false") >= 0) motionEnabled = false;
 
+  Serial.println("[Motion] motionEnabled = " + String(motionEnabled));
+
   server.send(200, "application/json", "{\"status\":\"ok\"}");
+}
+
+// ===== /history handler =====
+static void handleHistory() {
+  String out = "[";
+  int count = min(historyIndex, 50);
+
+  for (int i = 0; i < count; i++) {
+    int idx = (historyIndex - count + i) % 50;
+    out += "{";
+    out += jsonKV("type", historyLog[idx].type);
+    out += jsonKV("time", historyLog[idx].timestamp, true);
+    out += "}";
+    if (i < count - 1) out += ",";
+  }
+  out += "]";
+  server.send(200, "application/json", out);
 }
 
 // ===== Server setup =====
 void setupAPI() {
   server.on("/status",   HTTP_GET, handleStatus);
-  // server.on("/set",      HTTP_POST, handleSet);
   server.on("/set", HTTP_ANY, handleSet);
   server.on("/setTemp",  HTTP_POST, handleSet);
   server.on("/motion/set", HTTP_POST, handleMotionSet);
   server.on("/i2c-scan", HTTP_GET, handleI2CScan);
+  server.on("/history", HTTP_GET, handleHistory);
   server.begin();
   Serial.println(F("[HTTP] server started"));
 }
@@ -181,29 +273,33 @@ void setupAPI() {
 // ===== Public snapshot for OLED / dashboard callers =====
 bool api_getSnapshot(float& tempF, float& targetF, String& mode)
 {
-  if (!bmeInitialized) return false;
+    if (!bmeInitialized) return false;
 
-  float tC = bme.readTemperature();
+    float tC = bme.readTemperature();
+    if (isnan(tC)) return false;
 
-  if (isnan(tC)) return false;
+    tempF   = c_to_f(tC);
+    targetF = targetTempF;
 
-  tempF        = c_to_f(tC);
+    const float delta = tempF - targetTempF;
+    const float HYST = 0.25f;
 
-  targetF = targetTempF;
+    // 1) If user set system Off
+    if (hvacMode == "Off") {
+        mode = "Off";
+        return true;
+    }
 
-  // If mode is the combined mode, choose heating or cooling dynamically
-  if (hvacMode == "Heating/Cooling") {
-      if (tempF < targetTempF) {
-          mode = "Heat";
-      } else if (tempF > targetTempF) {
-          mode = "Cool";
-      } else {
-          mode = "Off"; // or idle
-      }
-  } else {
-      // Otherwise use the set mode directly
-      mode = hvacMode;
-  }
+    // 2) Heating/Cooling logic
+    // Always compute mode based on hvacMode and temperature, even if motion is off
+    if (hvacMode == "Heating/Cooling") {
+        if (delta < -HYST)      mode = "Heat";
+        else if (delta > HYST)  mode = "Cool";
+        else                     mode = "Idle";
+    } else {
+        // User manually set Heat or Cool
+        mode = hvacMode;
+    }
 
-  return true;
+    return true;
 }
