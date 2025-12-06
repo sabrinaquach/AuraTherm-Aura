@@ -1,16 +1,12 @@
-#include "PIRSensor.h"
+#pragma once
+#include <Arduino.h>
 
-void PIRSensor::begin(uint8_t pin, bool usePulldown, uint32_t warmupMs) {
-  _pin = pin;
-  if (usePulldown) pinMode(_pin, INPUT_PULLDOWN);
-  else             pinMode(_pin, INPUT);
+class PIRSensor {
+public:
+  void begin(uint8_t pin, bool usePulldown=true, uint32_t warmupMs=0);
+  bool raw() const;
 
-  _warmupEnd = millis() + warmupMs;
-}
-
-bool PIRSensor::raw() const {
-  // ignore during warmup
-  if ((int32_t)(millis() - _warmupEnd) < 0) return false;
-  return digitalRead(_pin);
-}
-
+private:
+  uint8_t _pin = 255;
+  uint32_t _warmupEnd = 0;
+};
