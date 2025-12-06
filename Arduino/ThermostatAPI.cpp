@@ -12,7 +12,7 @@ Adafruit_BME280 bme;
 bool bmeInitialized = false;
 bool motionEnabled = true;
 
-// Example thermostat state (replace with your real state if you have it)
+//def
 float  targetTempF = 72.0f;
 String hvacMode    = "Off";  // "Heating" / "Cooling" / "Off"
 
@@ -29,7 +29,6 @@ void temp_setup() {
   if (bme.begin(0x76, &Wire) || bme.begin(0x77, &Wire)) {
     bmeInitialized = true;
 
-    // Optional sampling config
     bme.setSampling(
       Adafruit_BME280::MODE_NORMAL,
       Adafruit_BME280::SAMPLING_X1,   // temp
@@ -83,7 +82,7 @@ static void handleStatus() {
   }
   out += "}";
 
-  // (Optional) update OLED on each /status hit so API & screen match
+  // update OLED on each /status hit so API & screen match
   if (ok && display_ok()) {
     display_update(tempF, tgtF, mode);
   }
@@ -128,7 +127,7 @@ static void handleSet() {
   String body = server.arg("plain");
   Serial.println("[API] Incoming JSON: " + body);
 
-  // Parse "targetTemp" (match your React app!)
+  // Parse "targetTemp" (match app)
   int tIdx = body.indexOf("targetTemp");
   if (tIdx >= 0) {
     int colon = body.indexOf(":", tIdx);
