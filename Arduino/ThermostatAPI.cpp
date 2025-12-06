@@ -86,6 +86,10 @@ static String jsonKV(const char* k, float v, bool last=false, uint8_t digits=1) 
   return s;
 }
 
+// ===== History tracking globals =====
+static float lastTempF = NAN;
+static bool  lastMotion = false;
+
 // ===== /status handler =====
 static void handleStatus() {
   float tempF, tgtF;
@@ -101,6 +105,19 @@ static void handleStatus() {
 
     out += ",\"motionEnabled\":";
     out += motionEnabled ? "true" : "false";
+
+        // ===== HISTORY LOGGING =====
+        // Temp change
+        if (isnan(lastTempF) || fabs(tempF - lastTempF) >= 0.1f) { // log if change >= 0.1°F
+            pushHistory("TempChange");
+            lastTempF = tempF;
+        }
+
+        // Motion detected
+        if (motionEnabled && !lastMotion) { // log only on rising edge
+            pushHistory("MotionDetected");
+        }
+        lastMotion = motionEnabled;
 
   } else {
     out += jsonKV("error", "sensor_unavailable", true);
@@ -130,67 +147,6 @@ static void handleI2CScan() {
   server.send(200, "application/json", out);
 }
 
-// static void handleSet() {
-//   //debug
-//   Serial.println("---- REQUEST DEBUG ----");
-//   Serial.println("Method: " + String(server.method()));
-//   Serial.println("Args count: " + String(server.args()));
-
-//   for (int i = 0; i < server.args(); i++) {
-//     Serial.println(server.argName(i) + " = " + server.arg(i));
-//   }
-
-//   String rawBody = server.arg("plain");
-//   Serial.println("RAW BODY: [" + rawBody + "]");
-//   Serial.println("-----------------------");
-  
-//   if (!server.hasArg("plain")) {
-//     server.send(400, "application/json", "{\"error\":\"no_body\"}");
-//     return;
-//   }
-
-//   String body = server.arg("plain");
-//   Serial.println("[API] Incoming JSON: " + body);
-
-//   // Parse "targetTemp" (match your React app!)
-//   int tIdx = body.indexOf("targetTemp");
-//   if (tIdx >= 0) {
-//     int colon = body.indexOf(":", tIdx);
-//     int comma = body.indexOf(",", colon);
-//     if (comma < 0) comma = body.indexOf("}", colon);
-
-//     targetTempF = body.substring(colon + 1, comma).toFloat();
-//     Serial.println("Updated targetTempF: " + String(targetTempF));
-//   }
-
-//   // Parse mode if included
-//   // int mIdx = body.indexOf("mode");
-//   // if (mIdx >= 0) {
-//   //   int colon  = body.indexOf(":", mIdx);
-//   //   int quote1 = body.indexOf("\"", colon + 1);
-//   //   int quote2 = body.indexOf("\"", quote1 + 1);
-
-//   //   hvacMode = body.substring(quote1 + 1, quote2);
-//   //   Serial.println("Updated hvacMode: " + hvacMode);
-//   // }
-
-//   int mIdx = body.indexOf("mode");
-//   if (mIdx >= 0) {
-//     int colon  = body.indexOf(":", mIdx);
-//     int quote1 = body.indexOf("\"", colon + 1);
-//     int quote2 = body.indexOf("\"", quote1 + 1);
-
-//     String newMode = body.substring(quote1 + 1, quote2);
-    
-//     // Allow manual override anytime
-//     if (newMode == "Heat" || newMode == "Cool" || newMode == "Off") {
-//         hvacMode = newMode;
-//         Serial.println("Updated hvacMode: " + hvacMode);
-//     }
-//   }
-
-//   server.send(200, "application/json", "{\"status\":\"ok\"}");
-// }
 
 static void handleSet() {
     if (!server.hasArg("plain")) {
@@ -284,21 +240,14 @@ bool api_getSnapshot(float& tempF, float& targetF, String& mode)
     const float delta = tempF - targetTempF;
     const float HYST = 0.25f;
 
-    // 1) If user set system Off
     if (hvacMode == "Off") {
         mode = "Off";
-        return true;
-    }
-
-    // 2) Heating/Cooling logic
-    // Always compute mode based on hvacMode and temperature, even if motion is off
-    if (hvacMode == "Heating/Cooling") {
+    } else if (hvacMode == "Heating/Cooling") {
         if (delta < -HYST)      mode = "Heat";
         else if (delta > HYST)  mode = "Cool";
         else                     mode = "Idle";
     } else {
-        // User manually set Heat or Cool
-        mode = hvacMode;
+        mode = hvacMode; // respect manual Heat/Cool
     }
 
     return true;
