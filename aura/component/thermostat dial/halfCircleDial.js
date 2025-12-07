@@ -22,7 +22,7 @@ export default function ThermostatDial({
   dialColor = "#A3C858FF",
 
   //visuals of temp dial
-  glowSigma = 36,
+  glowSigma = 37,
   trackWidth = 12,
   progressWidth = 28,
   handleRadius = 12,

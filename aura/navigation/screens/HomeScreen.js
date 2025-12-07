@@ -13,18 +13,6 @@ import ModeSelectModal from '../../component/ModeSelectModal';
 const { width: W, height: H } = Dimensions.get('window');
 const SIZE = Math.min(W, H) * 2;
 
-function getTempBehaviorColor(current, target) {
-  if (current == null || target == null) return '#A3C858FF';
-
-  const c = Number(current);
-  const t = Number(target);
-
-  if (t > c) return '#FF8C00';
-  if (t < c) return '#00BFFF';
-
-  return '#A3C858FF';
-}
-
 function getModeColor(mode) {
   const m = (mode || "").toLowerCase();
   if (m === "heating" || m === "heat") return "#FF8C00";   //orange
@@ -113,7 +101,8 @@ export default function HomeScreen({ }) {
   const targetTemp  = status?.targetTemp ?? null;
   const currentTemp = status?.currentTemp ?? '—';
   const unitSuffix  = tempUnit ?? '';
-  const mode        = status?.mode ?? 'off';
+  const mode = status?.mode;
+  const isOffMode = mode?.toLowerCase() === "off";
   
   const [uiTemp, setUiTemp] = useState(status?.targetTemp ?? 70);
   const dialColor = getModeColor(status?.mode);
@@ -123,6 +112,7 @@ export default function HomeScreen({ }) {
   console.log("CLEANED MODE:", (status?.mode || "").trim().toLowerCase());
 
   const motionEnabled = status?.motionEnabled == true;
+  const modeEnabled = status?.modeEnabled == true;
 
   //display temp
   const formatTemp = (v) => {
@@ -161,14 +151,14 @@ export default function HomeScreen({ }) {
     <View style={MainScreensStyle.container}>
       {/* occupied room dropdown */}
       <View style={styles.header}>
-        {/* <HomeControlTab
+        <HomeControlTab
           values={tabLabels}
           selectedIndex={selectedIndex}
           onSelect={(index) => {
               const room = occupiedOptions[index];
               if (room) setSelectedRoomId(room.value);
           }}
-        /> */}
+        />
         <Dropdown
           data={occupiedOptions}
           labelField="label"
@@ -219,7 +209,7 @@ export default function HomeScreen({ }) {
             <Text style={styles.label}>Failed to load status.</Text>
           ) : (
             <>
-              {status?.mode?.toLowerCase() !== "off" && (
+              {!isOffMode && (
                 <Text style={styles.tempStatusText}>
                   {getDisplayMode(status?.mode)}
                 </Text>
@@ -233,36 +223,41 @@ export default function HomeScreen({ }) {
             </>
           )}
         </View>
+        
+        <View style={styles.buttonRow}>
+          {/* Mode button */}
+          <TouchableOpacity
+            style={[
+              styles.modeButton,
+              { backgroundColor: modeEnabled ? "#A3C858" : "#D9D9D9" }
+            ]}
+            onPress={() => setModeModalVisible(true)}
+          >
+            <Feather name="power" size={16} />
+            <Text style={styles.modeButtonText}>Mode</Text>
+          </TouchableOpacity>
 
-        {/* Mode button */}
-        <TouchableOpacity
-          style={styles.modeButton}
-          onPress={() => setModeModalVisible(true)}
-        >
-        <Feather name="power" size={16} />
-        <Text style={styles.modeButtonText}>Mode</Text>
-        </TouchableOpacity>
+          <ModeSelectModal
+            visible={modeModalVisible}
+            onClose={() => setModeModalVisible(false)}
+            mode={status?.mode}
+            onSelect={(m) => setModeOnESP(m)}
+          />
 
-        <ModeSelectModal
-          visible={modeModalVisible}
-          onClose={() => setModeModalVisible(false)}
-          mode={status?.mode}
-          onSelect={(m) => setModeOnESP(m)}
-        />
-
-        {/* Motion button */}
-        <TouchableOpacity
-          style={[
-            styles.motionButton,
-            { backgroundColor: motionEnabled ? "#A3C858" : "#D9D9D9" }
-          ]}
-          onPress={() => setMotionOnESP(!motionEnabled)}
-        >
-          <Feather name="users" size={16} />
-          <Text style={styles.modeButtonText}>
-            {motionEnabled ? "Motion On" : "Motion Off"}
-          </Text>
-        </TouchableOpacity>
+          {/* Motion button */}
+          <TouchableOpacity
+            style={[
+              styles.motionButton, 
+              { backgroundColor: motionEnabled ? "#A3C858" : "#D9D9D9" }
+            ]}
+            onPress={() => setMotionOnESP(!motionEnabled)}
+          >
+            <Feather name="users" size={16} />
+            <Text style={styles.modeButtonText}>
+              {motionEnabled ? "Motion" : "Motion"}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -338,16 +333,31 @@ const styles = StyleSheet.create({
   },
   modeButton: {
     backgroundColor: '#D9D9D9',
-    width: 77,
-    height: 35,
+    width: 65,
+    height: 32,
     display: 'flex',
-    flexDirection: 'row'
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+    borderRadius: 10,
+    padding: 1,
   },
   motionButton: {
     backgroundColor: '#D9D9D9',
-    width: 77,
-    height: 35,
+    width: 70,
+    height: 32,
     display: 'flex',
-    flexDirection: 'row'
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+    borderRadius: 10,
+    padding: 1,
+  },
+  buttonRow: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 5,
+    paddingTop: 8,
   }
 });

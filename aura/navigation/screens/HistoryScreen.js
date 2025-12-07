@@ -1,11 +1,14 @@
-import * as React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 
 import MainScreensStyle from '../../style/MainScreenStyles';
 import ControlTab from '../../component/controlTab';
 import HistoryBox from '../../component/history/historyBox';
+import useThermostatStatus from '../../utilties/useThermostatStatus';
 
-export default function HistoryScreen ({ navigation }) {
+export default function HistoryScreen ({ }) {
+    const { data: status, motionHistory } = useThermostatStatus();
+      
     return (
         <View style={MainScreensStyle.container}>
             <Text style={MainScreensStyle.title}>History</Text>
@@ -13,25 +16,21 @@ export default function HistoryScreen ({ navigation }) {
                 labelOne="Today"
                 labelTwo="Yesterday"
             />
-
+        <ScrollView showsVerticalScrollIndicator={false}>
             <View style={Style.HistoryBoxesContainer}>
-                <HistoryBox 
-                    room="Bedroom"         //test values before connected with hardware
-                    temp="60"
-                    time="10:30 AM"         //need to code the time logged when user changes temp
-                    unit="unit"
-                    mode="Auto"
-                    currentTemp="80"
-                />
-                <HistoryBox 
-                    room="Bedroom"       
-                    temp="80"
-                    time="11:28 PM"
-                    unit="unit"
-                    mode="Manual"
-                    currentTemp="60"
-                />
+                {motionHistory.map((event, index) => (
+                    <HistoryBox
+                        key={index}
+                        room="Living Room"
+                        time={event.time}
+                        temp={event.currentTemp}
+                        currentTemp={event.currentTemp}
+                        targetTemp={event.targetTemp}
+                        mode={event.mode}
+                    />
+                ))}
             </View>
+        </ScrollView>
         </View>
     );
 }
