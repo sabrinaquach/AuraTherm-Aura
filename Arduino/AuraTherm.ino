@@ -18,6 +18,10 @@ extern WebServer server;
 extern bool wifiConnected; 
 extern bool motionEnabled;
 
+bool motionRaw() {
+    return pir.raw();
+}
+
 void setup() {
   Serial.begin(115200);
   delay(200);
@@ -54,10 +58,10 @@ void setup() {
                 PIR_GPIO, PIR_WARMUP_MS / 1000);
 
   //LED setup
-  // pinMode(32, OUTPUT);  // Blue LED
-  // pinMode(33, OUTPUT);  // Red LED
-  // digitalWrite(32, LOW); // Blue LED off initially
-  // digitalWrite(33, LOW); // Red LED off initially
+  pinMode(32, OUTPUT);  // Blue LED
+  pinMode(33, OUTPUT);  // Red LED
+  digitalWrite(32, LOW); // Blue LED off initially
+  digitalWrite(33, LOW); // Red LED off initially
 
   Serial.println("[AuraTherm] Ready.");
 }
@@ -76,30 +80,36 @@ void loop() {
     raw = digitalRead(PIR_GPIO);
   }
 
-  // ----- RAW PIR HVAC CONTROL -----
+  // ----- AUTOMATIC HVAC EFFECT (NOT CONTROL) -----
+  static String effectiveMode = "Off";
+
   if (motionEnabled) {
+      
+      hvacMode = "Heating/Cooling"; //restore auto mode when motionEnabled = true
       if (raw) {
-          // Raw detected → activate heating/cooling
           if (api_getSnapshot(tempF, tgtF, mode)) {
-              if (tempF < tgtF) {
-                  hvacMode = "Heat";
-              } else if (tempF > tgtF) {
-                  hvacMode = "Cool";
-              } else {
-                  hvacMode = "Off";
-              }
+              effectiveMode = mode;
           } else {
-              hvacMode = "Off"; // sensor failure fallback
+              effectiveMode = "Off";
+              hvacMode = "Off";
           }
       } else {
-          // No raw motion → turn HVAC off
+          effectiveMode = "Off";   // motion enabled, no motion → force off
           hvacMode = "Off";
       }
-  }
 
+  } else {
+      // motion disabled → trust API fully (manual mode)
+      if (api_getSnapshot(tempF, tgtF, mode)) {
+          effectiveMode = mode;
+      } else {
+          effectiveMode = "Off";
+      }
+  }
+  
   // // ===== LED control =====
-  // digitalWrite(32, motionEnabled ? HIGH : LOW);
-  // digitalWrite(33, (hvacMode == "Heat" || hvacMode == "Cool") ? HIGH : LOW);
+  digitalWrite(32, motionEnabled ? HIGH : LOW);
+  digitalWrite(33, (effectiveMode == "Heat" || effectiveMode == "Cool") ? HIGH : LOW);
 
 
   // -------- DEBUG HEARTBEAT --------
