@@ -147,6 +147,8 @@ export default function HomeScreen({ }) {
 
   const [modeModalVisible, setModeModalVisible] = useState(false);
 
+  const motionIcon = motionEnabled ? "user" : "user-x";
+
   return (
     <View style={MainScreensStyle.container}>
       {/* occupied room dropdown */}
@@ -229,7 +231,7 @@ export default function HomeScreen({ }) {
           <TouchableOpacity
             style={[
               styles.modeButton,
-              { backgroundColor: modeEnabled ? "#A3C858" : "#D9D9D9" }
+              { backgroundColor: modeEnabled ? "#FFEB99" : "#D9D9D9" }
             ]}
             onPress={() => setModeModalVisible(true)}
           >
@@ -247,12 +249,12 @@ export default function HomeScreen({ }) {
           {/* Motion button */}
           <TouchableOpacity
             style={[
-              styles.motionButton, 
-              { backgroundColor: motionEnabled ? "#A3C858" : "#D9D9D9" }
+              styles.motionButton,
+              { backgroundColor: motionEnabled ? "#FFEB99" : "#D9D9D9" }
             ]}
             onPress={() => setMotionOnESP(!motionEnabled)}
           >
-            <Feather name="users" size={16} />
+            <Feather name={motionIcon} size={16} color='#000' />
             <Text style={styles.modeButtonText}>
               {motionEnabled ? "Motion" : "Motion"}
             </Text>

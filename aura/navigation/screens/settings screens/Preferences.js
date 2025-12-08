@@ -137,33 +137,6 @@ export default function MainPreferences ({ navigation }) {
                         />
                     )}
                 </View>
-                <View style={MainScreensStyle.sliderContainer}>
-                    <View style={MainScreensStyle.occupancyContainer}>
-                        <Text style={[MainScreensStyle.occupancyTitle, {paddingBottom: 2}]}>Occupancy Sensitivity </Text>
-                        <Text style={[MainScreensStyle.sensitivityNumber, {paddingBottom: 2}]}>{occupancyValue.toFixed(1)}</Text>
-                    </View>
-                    
-                    <View style={MainScreensStyle.labelsContainer}>
-                        {occupancyLabels.map((label) => (
-                            <Text key={label} style={MainScreensStyle.labelText}>{label}</Text>
-                        ))}
-                    </View>
-                    {/* <Text style={{ textAlign: 'center' }}>
-                        Current Sensitivity: {occupancyValue.toFixed(1)}
-                    </Text> */}
-                    <Slider 
-                        style={{width: '100%', height: 40, position: 'fixed'}}
-                        minimumValue={0}
-                        maximumValue={2}
-                        step={0.1}
-                        value={occupancyValue}
-                        onValueChange={setOccupancyValue}
-                        minimumTrackTintColor="#D9D9D9"
-                        maximumTrackTintColor="#D9D9D9"
-                        thumbTintColor="#A3C858C9"
-                    />
-                    <Text style={MainScreensStyle.text}>Set how sensitive AuraTherm is to motion.</Text>
-                </View>
                 <View style={MainScreensStyle.secondSliderContainer}>
                 <Text style={[MainScreensStyle.subtitle, {paddingBottom: 2}]}>Energy Priority</Text>
                     <View style={MainScreensStyle.labelsContainer}>

@@ -57,8 +57,12 @@ const MainScreensStyle = StyleSheet.create ({
         fontSize: 16,
     },
     additionsContainer: {
+        paddingTop: 50,
+        backgroundColor: '#fff',
+    },
+    logOutContainer: {
+        marginBottom: 50,
         paddingHorizontal: 20,
-        paddingBottom: 20,
         backgroundColor: '#fff',
     },
     itemRow: {

@@ -5,22 +5,29 @@ export default function useThermostatStatus() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  //history tracking
+  const [history, setHistory] = useState([]);
+
+  //track last motion state and temp state
   const [lastMotion, setLastMotion] = useState(null);
-  const [motionHistory, setMotionHistory] = useState([]);
+  const [lastTargetTemp, setLastTargetTemp] = useState(null);
 
-  const ESP_IP = "http://172.20.10.13";
+  const ESP_IP = "http://172.20.10.13";   //http://172.20.10.02
 
-  const logMotionEvent = (motion, snapshot) => {
+  //log history event
+  const logHistoryEvent = (snapshot) => {
     const event = {
-      type: motion ? "motion_start" : "motion_end",
-      time: new Date().toLocaleTimeString(),
+      type: snapshot.type,
+      time: new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }),
       currentTemp: snapshot.currentTemp,
       targetTemp: snapshot.targetTemp,
-      mode: snapshot.mode,   // <-- THIS is correct now
+      mode: snapshot.mode,
     };
-    setMotionHistory(prev => [...prev, event]);
+
+    setHistory((prev) => [event, ...prev]);
   };
 
+  //polling 
   useEffect(() => {
     let mounted = true;
 
@@ -28,36 +35,44 @@ export default function useThermostatStatus() {
       try {
         const res = await fetch(`${ESP_IP}/status`);
         const json = await res.json();
-
         if (!mounted) return;
 
-        // Update state FIRST
         setData(json);
 
+        //current motion state from ESP
         const currentMotion =
           json.motionDetected ??
           json.motion_detected ??
           false;
 
-        // Detect edge
+        //motion start/end
         if (lastMotion !== null && currentMotion !== lastMotion) {
-          logMotionEvent(currentMotion, {
+          logHistoryEvent({
+            type: currentMotion ? "motion_start" : "motion_end",
             currentTemp: json.currentTemp,
             targetTemp: json.targetTemp,
-
-            // USE USER MODE, NOT HVAC STATE:
-            mode: json.mode === "Idle" || json.mode === "Heat" || json.mode === "Cool"
-              ? "Heating/Cooling"
-              : json.mode,
+            mode: json.mode,
           });
         }
 
         setLastMotion(currentMotion);
 
-      } catch (e) {
-        if (mounted) setError(e);
+        //temp change
+        if (lastTargetTemp !== null && json.targetTemp !== lastTargetTemp) {
+          logHistoryEvent({
+            type: currentMotion ? "temp_change" : "temp_change_no_motion",
+            currentTemp: json.currentTemp,
+            targetTemp: json.targetTemp,
+            mode: json.mode,
+          });
+        }
+
+        setLastTargetTemp(json.targetTemp);
+
+      } catch (err) {
+        if (mounted) setError(err);
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     }
 
@@ -67,43 +82,45 @@ export default function useThermostatStatus() {
       mounted = false;
       clearInterval(interval);
     };
-  }, [lastMotion]);
+  }, [lastMotion, lastTargetTemp]);
 
-  // ---- rest unchanged ----
+  //aet temp
   const setTargetTempOnESP = useCallback(async (v) => {
     try {
       await fetch(`${ESP_IP}/set`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ targetTemp: v })
+        body: JSON.stringify({ targetTemp: v }),
       });
-      setData(prev => prev ? { ...prev, targetTemp: v } : { targetTemp: v });
+      setData((prev) => (prev ? { ...prev, targetTemp: v } : { targetTemp: v }));
     } catch (err) {
-      console.warn("Failed to send temp to ESP:", err);
+      console.warn("Failed to send temp:", err);
     }
   }, []);
 
+  //set mode
   const setModeOnESP = useCallback(async (newMode) => {
     try {
       await fetch(`${ESP_IP}/set`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode: newMode })
+        body: JSON.stringify({ mode: newMode }),
       });
-      setData(prev => prev ? { ...prev, mode: newMode } : { mode: newMode });
+      setData((prev) => (prev ? { ...prev, mode: newMode } : { mode: newMode }));
     } catch (err) {
-      console.warn("Failed to send mode to ESP:", err);
+      console.warn("Failed to send mode:", err);
     }
   }, []);
 
+  //toggle motion
   const setMotionOnESP = useCallback(async (value) => {
     try {
       await fetch(`${ESP_IP}/motion/set`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ motion: value })
+        body: JSON.stringify({ motion: value }),
       });
-      setData(prev =>
+      setData((prev) =>
         prev ? { ...prev, motionEnabled: value } : { motionEnabled: value }
       );
     } catch (err) {
@@ -118,6 +135,6 @@ export default function useThermostatStatus() {
     setTargetTempOnESP,
     setModeOnESP,
     setMotionOnESP,
-    motionHistory,
+    history,
   };
 }

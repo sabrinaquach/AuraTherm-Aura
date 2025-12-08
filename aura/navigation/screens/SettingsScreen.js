@@ -100,7 +100,7 @@ export default function SettingsScreen ({ navigation }) {
       } = usePreferences();
     
     return (
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, backgroundColor: '#fff' }}>
             <Loader visible={loading} label="Logging you out..."/>
             <View style={MainScreensStyle.container}>
                 <Text style={MainScreensStyle.title}>Settings</Text>
@@ -119,66 +119,47 @@ export default function SettingsScreen ({ navigation }) {
                         onRemovePress={() => removeImage()}
                     />
                 </View>
-        
-                <View style={MainScreensStyle.sliderContainer}>
-                    <Text style={[MainScreensStyle.subtitle, {paddingBottom: 2}]}>Occupancy Sensitivity</Text>
-                    <View style={MainScreensStyle.labelsContainer}>
-                        {Occupancylabels.map((label) => (
-                            <Text key={label} style={MainScreensStyle.labelText}>{label}</Text>
-                        ))}
-                    </View>
-                    <Slider 
-                        style={{width: '100%', height: 40}}
-                        minimumValue={0}
-                        maximumValue={2}
-                        step={0.1}
-                        value={occupancySensitivity}
-                        onValueChange={setOccupancySensitivity}
-                        minimumTrackTintColor="#D9D9D9"
-                        maximumTrackTintColor="#D9D9D9"
-                        thumbTintColor="#A3C858C9"
-                    />
-                    <Text style={MainScreensStyle.text}>Set how sensitive AuraTherm is to motion—higher levels may change temperature more often.</Text>
+                <View style={MainScreensStyle.additionsContainer}>
+                    <View style={MainScreensStyle.separator}/>
+                    <TouchableOpacity 
+                        style={MainScreensStyle.itemRow} 
+                        onPress={() => navigation.navigate('AccountInfo')}
+                    >
+                        <Text style={MainScreensStyle.itemText}>Account Information</Text>
+                        <Icon 
+                            name="chevron-right" 
+                            size={25} 
+                            style={MainScreensStyle.itemIcon}
+                        />
+                    </TouchableOpacity>
+                    <View style={MainScreensStyle.separator}/>
+                    <TouchableOpacity 
+                        style={MainScreensStyle.itemRow} 
+                        onPress={() => navigation.navigate('MainPreferences')}
+                    >
+                        <Text style={MainScreensStyle.itemText}>Preferences</Text>
+                        <Icon 
+                            name="chevron-right" 
+                            size={25} 
+                            style={MainScreensStyle.itemIcon}
+                        />
+                    </TouchableOpacity>
+                    <View style={MainScreensStyle.separator}/>
                 </View>
             </View>
-        
-            <View style={MainScreensStyle.additionsContainer}>
+            <View style={MainScreensStyle.logOutContainer}>
                 <View style={MainScreensStyle.separator}/>
-                <TouchableOpacity 
-                    style={MainScreensStyle.itemRow} 
-                    onPress={() => navigation.navigate('AccountInfo')}
-                >
-                    <Text style={MainScreensStyle.itemText}>Account Information</Text>
-                    <Icon 
-                        name="chevron-right" 
-                        size={25} 
-                        style={MainScreensStyle.itemIcon}
-                    />
-                </TouchableOpacity>
-                <View style={MainScreensStyle.separator}/>
-                <TouchableOpacity 
-                    style={MainScreensStyle.itemRow} 
-                    onPress={() => navigation.navigate('MainPreferences')}
-                >
-                    <Text style={MainScreensStyle.itemText}>Preferences</Text>
-                    <Icon 
-                        name="chevron-right" 
-                        size={25} 
-                        style={MainScreensStyle.itemIcon}
-                    />
-                </TouchableOpacity>
-                <View style={MainScreensStyle.separator}/>
-                <TouchableOpacity 
-                    style={MainScreensStyle.itemRow} 
-                    onPress={handleLogout}
-                >
-                    <Text style={MainScreensStyle.itemText}>Log Out</Text>
-                    <Icon 
-                        name="log-out" 
-                        size={25} 
-                        style={MainScreensStyle.itemIcon}
-                    />
-                </TouchableOpacity>
+                    <TouchableOpacity 
+                        style={MainScreensStyle.itemRow} 
+                        onPress={handleLogout}
+                    >
+                        <Text style={MainScreensStyle.itemText}>Log Out</Text>
+                        <Icon 
+                            name="log-out" 
+                            size={25} 
+                            style={MainScreensStyle.itemIcon}
+                        />
+                    </TouchableOpacity>
                 <View style={MainScreensStyle.separator}/>
             </View>
         </View>
