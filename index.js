@@ -25,8 +25,6 @@ import EditAccountInfo from './aura/navigation/screens/settings screens/EditAcco
 const Stack = createNativeStackNavigator();
 
 export default function OnboardingIndex() {
-
-    // 🔥 Mount thermostat hook ONCE globally
     const thermo = useThermostatStatus();
 
     return (

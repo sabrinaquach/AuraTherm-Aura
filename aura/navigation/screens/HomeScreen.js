@@ -77,7 +77,6 @@ export default function HomeScreen({ }) {
   const selectedRoomLabel =
     occupiedOptions.find(o => o.value === selectedRoomId)?.label || 'Living Room';
 
-  // Auto-select a valid room whenever occupancy changes
   useEffect(() => {
     if (occupiedOptions.length === 0) {
       setSelectedRoomId(null);
@@ -87,7 +86,6 @@ export default function HomeScreen({ }) {
     const stillExists = occupiedOptions.some(r => r.value === selectedRoomId);
     
     if (!stillExists) {
-      // Select first occupied room
       setSelectedRoomId(occupiedOptions[0].value);
     }
   }, [occupiedOptions]);
