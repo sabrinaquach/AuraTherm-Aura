@@ -107,9 +107,20 @@ void loop() {
       }
   }
   
-  // // ===== LED control =====
-  digitalWrite(32, motionEnabled ? HIGH : LOW);
-  digitalWrite(33, (effectiveMode == "Heat" || effectiveMode == "Cool") ? HIGH : LOW);
+  // ===== LED STATUS INDICATORS =====
+
+  // Default OFF
+  digitalWrite(32, LOW); // Blue OFF
+  digitalWrite(33, LOW); // Red OFF
+
+  if (effectiveMode == "Cool") {
+      digitalWrite(32, HIGH); // Blue ON (cooling)
+  }
+  else if (effectiveMode == "Heat") {
+      digitalWrite(33, HIGH); // Red ON (heating)
+  }
+  // else → Off → both off
+
 
 
   // -------- DEBUG HEARTBEAT --------
