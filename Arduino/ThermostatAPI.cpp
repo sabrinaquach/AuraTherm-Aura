@@ -4,6 +4,7 @@
 #include <WebServer.h>
 
 #include "ThermostatAPI.h"
+#include "PIRSensor.h"
 #include "DisplayUI.h"
 
 // ===== History =====
@@ -103,21 +104,25 @@ static void handleStatus() {
     out += jsonKV("targetTemp",  tgtF);
     out += jsonKV("mode",        mode,   true);
 
+    bool motionNow = motionEnabled ? motionRaw() : false;
     out += ",\"motionEnabled\":";
     out += motionEnabled ? "true" : "false";
 
-        // ===== HISTORY LOGGING =====
-        // Temp change
-        if (isnan(lastTempF) || fabs(tempF - lastTempF) >= 0.1f) { // log if change >= 0.1°F
-            pushHistory("TempChange");
-            lastTempF = tempF;
-        }
+    out += ",\"motionDetected\":";
+    out += motionNow ? "true" : "false";
 
-        // Motion detected
-        if (motionEnabled && !lastMotion) { // log only on rising edge
-            pushHistory("MotionDetected");
-        }
-        lastMotion = motionEnabled;
+    // ===== HISTORY LOGGING =====
+    // Temp change
+    if (isnan(lastTempF) || fabs(tempF - lastTempF) >= 0.1f) { // log if change >= 0.1°F
+        pushHistory("TempChange");
+        lastTempF = tempF;
+     }
+
+    // Motion detected
+    if (motionNow != lastMotion) {
+       pushHistory(motionNow ? "MotionDetected" : "MotionCleared");
+    }
+    lastMotion = motionNow;
 
   } else {
     out += jsonKV("error", "sensor_unavailable", true);
@@ -245,7 +250,7 @@ bool api_getSnapshot(float& tempF, float& targetF, String& mode)
     } else if (hvacMode == "Heating/Cooling") {
         if (delta < -HYST)      mode = "Heat";
         else if (delta > HYST)  mode = "Cool";
-        else                     mode = "Idle";
+        else                     mode = "Off";
     } else {
         mode = hvacMode; // respect manual Heat/Cool
     }
