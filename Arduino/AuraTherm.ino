@@ -1,147 +1,260 @@
-#include "WiFiManager.h"
-#include "ThermostatAPI.h"
-#include "DisplayUI.h"
-#include "PIRSensor.h"
+#include <Arduino.h>
+#include <Wire.h>
+#include <Adafruit_BME280.h>
 #include <WebServer.h>
 
-// ------- PIR config -------
-static constexpr uint8_t  PIR_GPIO      = 14;          
-static constexpr uint32_t PIR_WARMUP_MS = 30 * 1000UL; 
-PIRSensor pir;
+#include "ThermostatAPI.h"
+#include "PIRSensor.h"
+#include "DisplayUI.h"
 
-// ------- Display pacing -------
-static uint32_t lastOLED = 0;
-static uint32_t lastDbg  = 0;
+// ----- History -----
+struct HistoryEvent {
+  String type;     
+  String timestamp;
+};
 
-// server in ThermostatAPI
-extern WebServer server;
-extern bool wifiConnected; 
-extern bool motionEnabled;
+HistoryEvent historyLog[50];  
+int historyIndex = 0;
 
-bool motionRaw() {
-    return pir.raw();
+String timestamp() {
+  unsigned long ms = millis();
+  unsigned long sec = ms / 1000;
+  unsigned long min = sec / 60;
+  unsigned long hr  = min / 60;
+
+  char buffer[20];
+  sprintf(buffer, "%02lu:%02lu:%02lu", hr % 24, min % 60, sec % 60);
+  return String(buffer);
 }
 
-void setup() {
-  Serial.begin(115200);
-  delay(200);
-  Serial.println("\n[AuraTherm] Booting...");
-
-  // 1) Wi-Fi
-  setupWiFi();
-  Serial.println("[AuraTherm] Waiting for Wi-Fi...");
-  
-  // 2) Sensors (BME280 on I2C)
-  temp_setup();
-
-  // 3) HTTP API
-  setupAPI();
-  
-  // 3a) RAW motion endpoint
-  server.on("/motion", HTTP_GET, []() {
-    bool raw = motionEnabled ? digitalRead(PIR_GPIO) : false;
-
-    String body = "{";
-    body += "\"motion_detected\":";
-    body += raw ? "true" : "false";
-    body += "}";
-
-    server.send(200, "application/json", body);
-  });
-
-  // 4) OLED
-  display_init(0x3C);
-
-  // 5) PIR init
-  pir.begin(PIR_GPIO, /*usePulldown=*/true, /*warmupMs=*/PIR_WARMUP_MS);
-  Serial.printf("[PIR] Using GPIO %u | warm-up %lus\n",
-                PIR_GPIO, PIR_WARMUP_MS / 1000);
-
-  //LED setup
-  pinMode(32, OUTPUT);  // Blue LED
-  pinMode(33, OUTPUT);  // Red LED
-  digitalWrite(32, LOW); // Blue LED off initially
-  digitalWrite(33, LOW); // Red LED off initially
-
-  Serial.println("[AuraTherm] Ready.");
+void pushHistory(String type) {
+  historyLog[historyIndex % 50] = { type, timestamp() };
+  historyIndex++;
 }
 
-void loop() {
-  uint32_t now = millis();
-  checkWiFi();
-  server.handleClient();
+// ----- Globals -----
+WebServer server(80);
+Adafruit_BME280 bme;
+bool bmeInitialized = false;
+bool motionEnabled = true;
 
+float  targetTempF = 72.0f;
+String hvacMode    = "Off";  // "Heating" / "Cooling" / "Off"
+
+// ----- Helpers -----
+static inline float c_to_f(float c) { return c * 9.0f / 5.0f + 32.0f; }
+
+// ----- Sensor setup -----
+void temp_setup() {
+  // ESP32 I2C pins
+  Wire.begin(21, 22);
+  Wire.setClock(100000);
+
+  // Try both addresses
+  if (bme.begin(0x76, &Wire) || bme.begin(0x77, &Wire)) {
+    bmeInitialized = true;
+
+    // sampling config
+    bme.setSampling(
+      Adafruit_BME280::MODE_NORMAL,
+      Adafruit_BME280::SAMPLING_X1,   // temp
+      Adafruit_BME280::SAMPLING_X1,   // pressure
+      Adafruit_BME280::SAMPLING_X1,   // humidity
+      Adafruit_BME280::FILTER_OFF,
+      Adafruit_BME280::STANDBY_MS_0_5
+    );
+
+    Serial.println(F("[BME280] Initialized"));
+  } else {
+    Serial.println(F("[BME280] NOT found on 0x76/0x77"));
+  }
+}
+
+// ----- Tiny JSON helpers (no ArduinoJson needed) -----
+static String jsonKV(const char* k, const String& v, bool last=false) {
+  String s = "\""; s += k; s += "\":\""; s += v; s += "\"";
+  if (!last) s += ",";
+  return s;
+}
+
+static String jsonKV(const char* k, float v, bool last=false, uint8_t digits=1) {
+  String s = "\""; 
+  s += k; 
+  s += "\":";
+  // Force the correct String() overload: (double, unsigned int)
+  s += String((double)v, (unsigned int)digits);
+  if (!last) s += ",";
+  return s;
+}
+
+// ----- History tracking globals -----
+static float lastTempF = NAN;
+static bool  lastMotion = false;
+
+// ----- /status handler -----
+static void handleStatus() {
   float tempF, tgtF;
   String mode;
 
-  // -------- RAW PIR CONTROL MODEL --------
-  bool raw = false;
-  if (motionEnabled) {
-    raw = digitalRead(PIR_GPIO);
-  }
+  bool ok = api_getSnapshot(tempF, tgtF, mode);
 
-  // ----- AUTOMATIC HVAC EFFECT (NOT CONTROL) -----
-  static String effectiveMode = "Off";
+  String out = "{";
+  if (ok) {
+    out += jsonKV("currentTemp", tempF);
+    out += jsonKV("targetTemp",  tgtF);
+    out += jsonKV("mode",        mode,   true);
 
-  if (motionEnabled) {
-      
-      hvacMode = "Heating/Cooling"; //restore auto mode when motionEnabled = true
-      if (raw) {
-          if (api_getSnapshot(tempF, tgtF, mode)) {
-              effectiveMode = mode;
-          } else {
-              effectiveMode = "Off";
-              hvacMode = "Off";
-          }
-      } else {
-          effectiveMode = "Off";   // motion enabled, no motion → force off
-          hvacMode = "Off";
-      }
+    bool motionNow = motionEnabled ? motionRaw() : false;
+    out += ",\"motionEnabled\":";
+    out += motionEnabled ? "true" : "false";
+
+    out += ",\"motionDetected\":";
+    out += motionNow ? "true" : "false";
+
+    // ----- History Logging -----
+    // Temp change
+    if (isnan(lastTempF) || fabs(tempF - lastTempF) >= 0.1f) { // log if change >= 0.1°F
+        pushHistory("TempChange");
+        lastTempF = tempF;
+     }
+
+    // Motion detected
+    if (motionNow != lastMotion) {
+       pushHistory(motionNow ? "MotionDetected" : "MotionCleared");
+    }
+    lastMotion = motionNow;
 
   } else {
-      // motion disabled → trust API fully (manual mode)
-      if (api_getSnapshot(tempF, tgtF, mode)) {
-          effectiveMode = mode;
-      } else {
-          effectiveMode = "Off";
-      }
+    out += jsonKV("error", "sensor_unavailable", true);
   }
-  
-  // ----- LED STATUS INDICATORS -----
+  out += "}";
 
-  // Default OFF
-  digitalWrite(32, LOW); // Blue OFF
-  digitalWrite(33, LOW); // Red OFF
-
-  if (effectiveMode == "Cool") {
-      digitalWrite(32, HIGH); // Blue ON (cooling)
+  // update OLED on each /status hit so API & screen match
+  if (ok && display_ok()) {
+    display_update(tempF, tgtF, mode);
   }
-  else if (effectiveMode == "Heat") {
-      digitalWrite(33, HIGH); // Red ON (heating)
+
+  server.send(200, "application/json", out);
+}
+
+// ----- /i2c-scan  -----
+static void handleI2CScan() {
+  byte count = 0;
+  String out = "[";
+  for (byte address = 1; address < 127; address++) {
+    Wire.beginTransmission(address);
+    if (Wire.endTransmission() == 0) {
+      if (count++) out += ",";
+      out += "\"0x" + String(address, HEX) + "\"";
+    }
   }
-  // else → Off → both off
+  out += "]";
+  server.send(200, "application/json", out);
+}
 
+// ----- /set handler -----
+static void handleSet() {
+    if (!server.hasArg("plain")) {
+        server.send(400, "application/json", "{\"error\":\"no_body\"}");
+        return;
+    }
 
+    String body = server.arg("plain");
+    Serial.println("[API] Incoming JSON: " + body);
 
-  // -------- DEBUG HEARTBEAT --------
-  if (now - lastDbg >= 1000) {
-    lastDbg = now;
+    // Parse targetTemp
+    int tIdx = body.indexOf("targetTemp");
+    if (tIdx >= 0) {
+        int colon = body.indexOf(":", tIdx);
+        int comma = body.indexOf(",", colon);
+        if (comma < 0) comma = body.indexOf("}", colon);
+        targetTempF = body.substring(colon + 1, comma).toFloat();
+        Serial.println("Updated targetTempF: " + String(targetTempF));
+    }
 
-    if (motionEnabled) {
-      Serial.printf("[HB] %lus | PIR raw=%d\n", now / 1000, raw);
+    // Parse hvacMode
+    int mIdx = body.indexOf("mode");
+    if (mIdx >= 0) {
+        int colon = body.indexOf(":", mIdx);
+        int quote1 = body.indexOf("\"", colon + 1);
+        int quote2 = body.indexOf("\"", quote1 + 1);
+        hvacMode = body.substring(quote1 + 1, quote2);
+        Serial.println("Updated hvacMode: " + hvacMode);
+    }
+
+    server.send(200, "application/json", "{\"status\":\"ok\"}");
+}
+
+// ----- /motion/set handler -----
+static void handleMotionSet() {
+  if (!server.hasArg("plain")) {
+    server.send(400, "application/json", "{\"error\":\"no_body\"}");
+    return;
+  }
+
+  String body = server.arg("plain");
+  Serial.println("[Motion] RAW: " + body);
+
+  if (body.indexOf("true") >= 0)  motionEnabled = true;
+  if (body.indexOf("false") >= 0) motionEnabled = false;
+
+  Serial.println("[Motion] motionEnabled = " + String(motionEnabled));
+
+  server.send(200, "application/json", "{\"status\":\"ok\"}");
+}
+
+// ----- /history handler -----
+static void handleHistory() {
+  String out = "[";
+  int count = min(historyIndex, 50);
+
+  for (int i = 0; i < count; i++) {
+    int idx = (historyIndex - count + i) % 50;
+    out += "{";
+    out += jsonKV("type", historyLog[idx].type);
+    out += jsonKV("time", historyLog[idx].timestamp, true);
+    out += "}";
+    if (i < count - 1) out += ",";
+  }
+  out += "]";
+  server.send(200, "application/json", out);
+}
+
+// ----- Server setup -----
+void setupAPI() {
+  server.on("/status",   HTTP_GET, handleStatus);
+  server.on("/set", HTTP_ANY, handleSet);
+  server.on("/setTemp",  HTTP_POST, handleSet);
+  server.on("/motion/set", HTTP_POST, handleMotionSet);
+  server.on("/i2c-scan", HTTP_GET, handleI2CScan);
+  server.on("/history", HTTP_GET, handleHistory);
+  server.begin();
+  Serial.println(F("[HTTP] server started"));
+}
+
+// ----- Public snapshot for OLED / dashboard callers -----
+bool api_getSnapshot(float& tempF, float& targetF, String& mode)
+{
+    if (!bmeInitialized) return false;
+
+    float tC = bme.readTemperature();
+    if (isnan(tC)) return false;
+
+    tempF   = c_to_f(tC);
+    targetF = targetTempF;
+
+    const float delta = tempF - targetTempF;
+    const float HYST = 0.25f;
+
+    if (hvacMode == "Off") {
+        mode = "Off";
+    } else if (hvacMode == "Heating/Cooling") {
+        if (delta < -HYST)      mode = "Heat";
+        else if (delta > HYST)  mode = "Cool";
+        else                     mode = "Off";
     } else {
-      Serial.printf("[HB] %lus | PIR DISABLED\n", now / 1000);
+        mode = hvacMode; // respect manual Heat/Cool
     }
-  }
 
-  // --- OLED refresh every 1000 ms ---
-  if (now - lastOLED >= 1000) {
-    lastOLED = now;
-
-    if (api_getSnapshot(tempF, tgtF, mode)) {
-      display_update(tempF, tgtF, mode);  
-    }
-  }
-
-  delay(5);
+    return true;
 }
