@@ -34,7 +34,7 @@ Table of Contents
 3. System Architecture
    <img width="684" height="564" alt="Screenshot 2025-12-10 at 6 21 31 PM" src="https://github.com/user-attachments/assets/c1064214-0f51-4647-a58f-b194723adb32" />
    
-4. Hardware Architecture
+5. Hardware Architecture
    Components:
    - ESP32 Microcontroller
    - BME280 Temperature sensor
