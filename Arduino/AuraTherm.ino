@@ -13,7 +13,7 @@ PIRSensor pir;
 static uint32_t lastOLED = 0;
 static uint32_t lastDbg  = 0;
 
-// 'server' lives in ThermostatAPI
+// server in ThermostatAPI
 extern WebServer server;
 extern bool wifiConnected; 
 extern bool motionEnabled;
@@ -107,7 +107,7 @@ void loop() {
       }
   }
   
-  // ===== LED STATUS INDICATORS =====
+  // ----- LED STATUS INDICATORS -----
 
   // Default OFF
   digitalWrite(32, LOW); // Blue OFF
@@ -145,4 +145,3 @@ void loop() {
 
   delay(5);
 }
-
