@@ -72,7 +72,7 @@ Table of Contents
    Softawre:
    
 9. API Endpoints
-   GET /status
+   - GET /status
       {
          currentTemp,
          targetTemp,
@@ -80,11 +80,11 @@ Table of Contents
          motionEnabled,
          modeEnabled
       }
-   POST /set-target
+   - POST /set-target
       { "temp": 72 }
-   POST /set-mode
+   - POST /set-mode
       { "mode": "heat" }
-   POST /motion-enable
+   - POST /motion-enable
       { "value": true }
 11. Known Limitations
    - only single room occupancy HVAC control and temperature sensing is supported
