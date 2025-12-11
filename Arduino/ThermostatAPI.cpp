@@ -7,7 +7,7 @@
 #include "PIRSensor.h"
 #include "DisplayUI.h"
 
-// ===== History =====
+// ----- History -----
 struct HistoryEvent {
   String type;     
   String timestamp;
@@ -32,7 +32,7 @@ void pushHistory(String type) {
   historyIndex++;
 }
 
-// ===== Globals =====
+// ----- Globals -----
 WebServer server(80);
 Adafruit_BME280 bme;
 bool bmeInitialized = false;
@@ -41,10 +41,10 @@ bool motionEnabled = true;
 float  targetTempF = 72.0f;
 String hvacMode    = "Off";  // "Heating" / "Cooling" / "Off"
 
-// ===== Helpers =====
+// ----- Helpers -----
 static inline float c_to_f(float c) { return c * 9.0f / 5.0f + 32.0f; }
 
-// ===== Sensor setup =====
+// ----- Sensor setup -----
 void temp_setup() {
   // ESP32 I2C pins
   Wire.begin(21, 22);
@@ -54,7 +54,7 @@ void temp_setup() {
   if (bme.begin(0x76, &Wire) || bme.begin(0x77, &Wire)) {
     bmeInitialized = true;
 
-    // Optional sampling config
+    // sampling config
     bme.setSampling(
       Adafruit_BME280::MODE_NORMAL,
       Adafruit_BME280::SAMPLING_X1,   // temp
@@ -70,7 +70,7 @@ void temp_setup() {
   }
 }
 
-// ===== Tiny JSON helpers (no ArduinoJson needed) =====
+// ----- Tiny JSON helpers (no ArduinoJson needed) -----
 static String jsonKV(const char* k, const String& v, bool last=false) {
   String s = "\""; s += k; s += "\":\""; s += v; s += "\"";
   if (!last) s += ",";
@@ -87,11 +87,11 @@ static String jsonKV(const char* k, float v, bool last=false, uint8_t digits=1) 
   return s;
 }
 
-// ===== History tracking globals =====
+// ----- History tracking globals -----
 static float lastTempF = NAN;
 static bool  lastMotion = false;
 
-// ===== /status handler =====
+// ----- /status handler -----
 static void handleStatus() {
   float tempF, tgtF;
   String mode;
@@ -111,7 +111,7 @@ static void handleStatus() {
     out += ",\"motionDetected\":";
     out += motionNow ? "true" : "false";
 
-    // ===== HISTORY LOGGING =====
+    // ----- History Logging -----
     // Temp change
     if (isnan(lastTempF) || fabs(tempF - lastTempF) >= 0.1f) { // log if change >= 0.1°F
         pushHistory("TempChange");
@@ -129,7 +129,7 @@ static void handleStatus() {
   }
   out += "}";
 
-  // (Optional) update OLED on each /status hit so API & screen match
+  // update OLED on each /status hit so API & screen match
   if (ok && display_ok()) {
     display_update(tempF, tgtF, mode);
   }
@@ -137,7 +137,7 @@ static void handleStatus() {
   server.send(200, "application/json", out);
 }
 
-// ===== /i2c-scan  =====
+// ----- /i2c-scan  -----
 static void handleI2CScan() {
   byte count = 0;
   String out = "[";
@@ -152,7 +152,7 @@ static void handleI2CScan() {
   server.send(200, "application/json", out);
 }
 
-
+// ----- /set handler -----
 static void handleSet() {
     if (!server.hasArg("plain")) {
         server.send(400, "application/json", "{\"error\":\"no_body\"}");
@@ -185,6 +185,7 @@ static void handleSet() {
     server.send(200, "application/json", "{\"status\":\"ok\"}");
 }
 
+// ----- /motion/set handler -----
 static void handleMotionSet() {
   if (!server.hasArg("plain")) {
     server.send(400, "application/json", "{\"error\":\"no_body\"}");
@@ -202,7 +203,7 @@ static void handleMotionSet() {
   server.send(200, "application/json", "{\"status\":\"ok\"}");
 }
 
-// ===== /history handler =====
+// ----- /history handler -----
 static void handleHistory() {
   String out = "[";
   int count = min(historyIndex, 50);
@@ -219,7 +220,7 @@ static void handleHistory() {
   server.send(200, "application/json", out);
 }
 
-// ===== Server setup =====
+// ----- Server setup -----
 void setupAPI() {
   server.on("/status",   HTTP_GET, handleStatus);
   server.on("/set", HTTP_ANY, handleSet);
@@ -231,7 +232,7 @@ void setupAPI() {
   Serial.println(F("[HTTP] server started"));
 }
 
-// ===== Public snapshot for OLED / dashboard callers =====
+// ----- Public snapshot for OLED / dashboard callers -----
 bool api_getSnapshot(float& tempF, float& targetF, String& mode)
 {
     if (!bmeInitialized) return false;
