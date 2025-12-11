@@ -98,6 +98,7 @@ Table of Contents
             - Sets delay from motion detected to motion not detected to 5-10 seconds.
           - Right knob (range)
       - Pull code and compile.
+   
    Softawre:
    1. Install Node.js and Expo CLI
    2. Run:
