@@ -6,7 +6,7 @@ Table of Contents
 1. Overview
 2. Features
 3. System Architecture
-4. Hardawre Architecture
+4. Hardware Architecture
 5. Software Architecture
 6. How to Run the Project
 7. API Endpoints
@@ -51,7 +51,36 @@ Table of Contents
    <img width="1226" height="589" alt="AuraTherm_Diagram_ss" src="https://github.com/user-attachments/assets/d966fb5f-4597-4bf7-9f5e-bfb00c36dbe8" />
    
 6. Software Architecture
-7. How to Run the Project
+   Aura consists of embedded firmware (ESP32), backend services (Supabase), and the mobile app (React Native Expo). Each layer communicates through HTTP requests and real-time listeners to keep temperature, occupancy, and mode states synchronized.
+   - ESP32 Firmware
+      - Implements HTTP server to expose thermostat control endpoints
+      - Reads temperature, humidity, and pressure data from the BME280 sensor.
+      - Listens for motion events using the PIR sensor.
+      - Posts state changes in real-time.
+      - Store modes: cool, heat, off.
+   - Mobile App (React Native Expo)
+      - Displays real-time sensor values from ESP32.
+      - User interface for:
+         - Setting target temperature
+         - Toggling mode (cool, heat, off)
+         - Enabling/disabiling motion control
+         - Viewing event logs in the History screen
+   - Communicates with ESP32 through direct HTTP requests to its local IP
+   - Supabase Backend
+      - Stores history logs such as temperature changes, motion events, mode changes.
+      - Manages user authentication.
+      - Stores and updates user preferences and profile pictures.
+
+   Data Flow Summary
+   <img width="1920" height="1080" alt="Add first action" src="https://github.com/user-attachments/assets/9532a86b-b35b-405c-bbf6-a791939f9c91" />
+   
+      1. ESP32 reads sensors and updates JSON state
+      2. App fetches state from /status
+      3. App sends control commands through POST requests
+      4. ESP32 updates internal state and displays on OLED sensor
+      5. App displays logs and real-time updates
+   
+8. How to Run the Project
    Hardware:
       - Follow hardware setup from diagram
       - Install Arduino IDE:
@@ -70,6 +99,13 @@ Table of Contents
           - Right knob (range)
       - Pull code and compile.
    Softawre:
+   1. Install Node.js and Expo CLI
+   2. Run:
+         npm install
+         npx expo start
+   3. In the app, configure:
+         - ESP32 local IP address
+         - Supabase URL and anon key
    
 9. API Endpoints
    - GET /status
