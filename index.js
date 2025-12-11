@@ -16,7 +16,6 @@ import RegisterAccount from './aura/onboarding/registerAccount.js';
 import TermsAndConditions from './aura/onboarding/terms.js';
 import Login from './aura/onboarding/login.js';
 import Preferences from './aura/onboarding/homePreferences.js';
-import NetworkPairing from './aura/onboarding/networkPairing.js';
 import Final from './aura/onboarding/final.js';
 import MainContainer from './aura/navigation/MainContainer.js';
 import AccountInfo from './aura/navigation/screens/settings screens/AccountInfo';
@@ -38,7 +37,6 @@ export default function OnboardingIndex() {
                     <Stack.Screen name="Terms" component={TermsAndConditions} />
                     <Stack.Screen name="Login" component={Login} />
                     <Stack.Screen name="Preferences" component={Preferences} />
-                    <Stack.Screen name="NetworkPairing" component={NetworkPairing} />
                     <Stack.Screen name="Final" component={Final} />
                     <Stack.Screen name="MainScreens" component={MainContainer} />
                     <Stack.Screen name="AccountInfo" component={AccountInfo} />

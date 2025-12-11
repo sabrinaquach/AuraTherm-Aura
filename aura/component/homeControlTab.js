@@ -1,58 +1,78 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import SegmentedControlTab from 'react-native-segmented-control-tab';
+import React from "react";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { Feather } from "@expo/vector-icons";
 
-export default function HomeControlTab({ values, selectedIndex, onSelect }) {
+export default function HomeControlTab({
+  values = [],
+  selectedIndex = 0,
+  onSelect,
+  motionByRoom = []
+}) {
 
-    return (
-        <View>
-            <SegmentedControlTab
-                values={values}
-                selectedIndex={selectedIndex}
-                onTabPress={onSelect}
-                tabStyle={styles.tabStyle}
-                activeTabStyle={styles.activeTabStyle}
-                tabsContainerStyle={styles.tabsContainerStyle}
-                tabTextStyle={styles.tabTextStyle}
-                activeTabTextStyle={styles.activeTabTextStyle}
-            />
-        </View>
-    );
+  return (
+    <View style={styles.container}>
+      <View style={styles.tabRow}>
+
+        {values.map((label, index) => {
+          const isActive = index === selectedIndex;
+          const motion = motionByRoom[index];
+
+          return (
+            <TouchableOpacity
+              key={index}
+              style={[styles.tab, isActive && styles.activeTab]}
+              onPress={() => onSelect(index)}
+            >
+              <Text style={[styles.tabText, isActive && styles.activeTabText]}>
+                {label}
+              </Text>
+
+              {/* motion indicator */}
+              {motion && (
+                <Feather 
+                  name="user" 
+                  size={14} 
+                  color="#000" 
+                  style={{ marginLeft: 6 }} 
+                />
+              )}
+            </TouchableOpacity>
+          );
+        })}
+
+      </View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    tabsContainerStyle: {
-      backgroundColor: '#f1f1f1', 
-      borderRadius: 5,
-      padding: 5,
-    },
-    tabStyle: {
-      borderWidth: 0,
-      backgroundColor: '#f1f1f1',
-      borderRadius: 5,
-      paddingVertical: 10,
-      borderWidth: 0,        
-      borderColor: 'transparent', 
-      shadowColor: 'transparent', 
-      elevation: 0,          
-    },
-    activeTabStyle: {
-      backgroundColor: '#fff',
-      borderRadius: 5,
-      borderWidth: 0,        
-      borderColor: 'transparent', 
-      shadowColor: 'transparent', 
-      elevation: 0,          
-    },
-    tabTextStyle: {
-      color: '#000',
-      fontWeight: '500',
-      fontSize: 16,
-    },
-    activeTabTextStyle: {
-      color: '#000',
-      fontWeight: '700',
-      fontSize: 16,
-    },
-  });
-  
+  container: {
+    marginBottom: 15,
+  },
+  tabRow: {
+    flexDirection: "row",
+    backgroundColor: "#f1f1f1",
+    borderRadius: 10,
+    padding: 5,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 10,
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  activeTab: {
+    backgroundColor: "#fff",
+  },
+  tabText: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#555",
+  },
+  activeTabText: {
+    fontWeight: "700",
+    color: "#000",
+  },
+});

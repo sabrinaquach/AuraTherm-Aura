@@ -4,12 +4,13 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import MainScreensStyle from '../../style/MainScreenStyles';
 import ControlTab from '../../component/controlTab';
 import HistoryBox from '../../component/history/historyBox';
-import useThermostatStatus from '../../utilties/useThermostatStatus';
 import ThermostatContext from '../../context/ThermostatContext';
 
 export default function HistoryScreen() {
     const { history, data, setTargetTempOnESP } = useContext(ThermostatContext);
-
+    
+    const ROOM_LIST = ["Living Room", "Kitchen"];
+      
     return (
         <View style={MainScreensStyle.container}>
             <Text style={MainScreensStyle.title}>History</Text>
@@ -21,7 +22,7 @@ export default function HistoryScreen() {
                 {(history ?? []).map((event, index) => (
                     <HistoryBox
                     key={index}
-                    room="Living Room"
+                    room={ROOM_LIST[index % 2]}
                     time={event.time}
                     temp={event.currentTemp}
                     currentTemp={event.currentTemp}

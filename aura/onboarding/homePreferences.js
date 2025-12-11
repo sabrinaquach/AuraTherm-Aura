@@ -44,7 +44,7 @@ const Preferences = ({ navigation }) => {
     };
     const [occupancyValue, setOccupancyValue] = useState(1);
 
-    //call usePreferences.js - load user preferences
+    //call usePreferences.js, load user preferences
     const {
         occupancySensitivity,
         setOccupancySensitivity,
@@ -113,7 +113,7 @@ const Preferences = ({ navigation }) => {
             </View>
             <Button 
                 backgroundColor="#A3C858C9"
-                title="Pair Device to Network" 
+                title="Save" 
                 onPress={async () => {
                     if (!tempUnit || !tempPreferences) {
                         alert("Please select both temperature unit and temperature range.");
@@ -136,12 +136,12 @@ const Preferences = ({ navigation }) => {
                       })
                       
                     
-                      navigation.navigate('NetworkPairing');
+                      navigation.navigate('Final');
                   }}
             />
             <Text 
                     style={onboardingStyle.skipDescription}
-                    onPress={() => navigation.navigate('NetworkPairing')}
+                    onPress={() => navigation.navigate('Final')}
                 >
                     Skip
                 </Text>

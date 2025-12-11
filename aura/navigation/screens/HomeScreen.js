@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Dimensions, TouchableOpacity } from 'react-native';
-import { Feather } from '@expo/vector-icons';
-import { Dropdown } from 'react-native-element-dropdown';        
+import { Feather } from '@expo/vector-icons';     
 import supabase from '../../auth/client';            
 import MainScreensStyle from '../../style/MainScreenStyles';
 import useThermostatStatus from '../../utilties/useThermostatStatus';
@@ -29,49 +28,24 @@ function getDisplayMode(mode) {
 }
 
 export default function HomeScreen({ }) {
-  const { data: status, loading: statusLoading, error: statusError, setTargetTempOnESP, setModeOnESP, setMotionOnESP } = useThermostatStatus();
+  const { data: status, loading: statusLoading, error: statusError, setTargetTempOnESP, setModeOnESP, setMotionOnESP } = useThermostatStatus(selectedRoomId);
   const { tempUnit, loading: prefsLoading } = usePreferences();
 
   //occupied rooms state 
   const [rooms, setRooms] = useState([]);
-  const [roomsLoading, setRoomsLoading] = useState(true);
+
+  // const [roomsLoading, setRoomsLoading] = useState(true);
   const [selectedRoomId, setSelectedRoomId] = useState(null);
 
-  //load rooms 
-  useEffect(() => {
-    let mounted = true;
-    async function load() {
-      setRoomsLoading(true);
-      const { data, error } = await supabase
-        .from('rooms')
-        .select('id,name,occupied,desired_temp')
-        .order('name', { ascending: true });
-      if (mounted && !error && data) setRooms(data);
-      setRoomsLoading(false);
-    }
-    load();
-    const ch = supabase
-      .channel('rooms-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms' }, (payload) => {
-        setRooms((prev) => {
-          const r = (payload.new || payload.old);
-          const map = new Map(prev.map(x => [x.id, x]));
-          if (payload.eventType === 'DELETE') map.delete(r.id);
-          else map.set(r.id, r);
-          return Array.from(map.values()).sort((a,b)=>a.name.localeCompare(b.name));
-        });
-      })
-      .subscribe();
-    return () => { mounted = false; supabase.removeChannel(ch); };
-  }, []);
-
-  const occupiedOptions = useMemo(() =>
-    rooms.filter(r => r.occupied).map(r => ({
-      label: r.name.replace(/_/g, ' '),
-      value: r.id,
-      current: r.desired_temp ?? null,
-    }))
-  , [rooms]);
+  //hard code room values (future implementation)
+  const ROOM_LIST = [
+    { value: 0, label: "Living Room" },
+    { value: 1, label: "Kitchen" }
+  ];
+  
+  const occupiedOptions = ROOM_LIST;
+  const tabLabels = ROOM_LIST.map(r => r.label);
+  const selectedIndex = ROOM_LIST.findIndex(r => r.value === selectedRoomId);
 
   const occupiedCount = occupiedOptions.length;
   const selectedRoomLabel =
@@ -90,11 +64,13 @@ export default function HomeScreen({ }) {
     }
   }, [occupiedOptions]);
 
-  const tabLabels = occupiedOptions.map(o => o.label);
-  const selectedIndex = occupiedOptions.findIndex(o => o.value === selectedRoomId);
-  
+  useEffect(() => {
+    if (selectedRoomId === null) {
+      setSelectedRoomId(ROOM_LIST[0].id);
+    }
+  }, []);  
 
-  const loading = statusLoading || prefsLoading || roomsLoading;
+  const loading = statusLoading || prefsLoading;
 
   const targetTemp  = status?.targetTemp ?? null;
   const currentTemp = status?.currentTemp ?? '—';
@@ -107,7 +83,6 @@ export default function HomeScreen({ }) {
 
   console.log("temp:", uiTemp, "→ dialColor:", dialColor);
   console.log("RAW MODE:", status?.mode);
-  console.log("CLEANED MODE:", (status?.mode || "").trim().toLowerCase());
 
   const motionEnabled = status?.motionEnabled == true;
   const modeEnabled = status?.modeEnabled == true;
@@ -154,26 +129,11 @@ export default function HomeScreen({ }) {
         <HomeControlTab
           values={tabLabels}
           selectedIndex={selectedIndex}
-          onSelect={(index) => {
-              const room = occupiedOptions[index];
-              if (room) setSelectedRoomId(room.value);
-          }}
-        />
-        <Dropdown
-          data={occupiedOptions}
-          labelField="label"
-          valueField="value"
-          value={selectedRoomId}
-          placeholder={`${occupiedCount} Rooms Occupied`}
-          onChange={(item) => setSelectedRoomId(item.value)}
-          style={styles.headerDropdown}
-          placeholderStyle={styles.headerText}
-          selectedTextStyle={styles.headerText}
-          containerStyle={styles.headerMenu}
-          renderRightIcon={() => <Feather name="chevron-down" size={16} color="#000" />}
-          search
-          searchPlaceholder="Search room..."
-          disable={occupiedCount === 0}
+          onSelect={(index) => setSelectedRoomId(ROOM_LIST[index].value)}
+          motionByRoom={[
+            status?.motionDetected ?? false,
+            status?.motionDetected ?? false
+          ]}
         />
       </View>
 
@@ -225,7 +185,7 @@ export default function HomeScreen({ }) {
         </View>
         
         <View style={styles.buttonRow}>
-          {/* Mode button */}
+          {/* mode button */}
           <TouchableOpacity
             style={[
               styles.modeButton,
@@ -244,7 +204,7 @@ export default function HomeScreen({ }) {
             onSelect={(m) => setModeOnESP(m)}
           />
 
-          {/* Motion button */}
+          {/* motion button */}
           <TouchableOpacity
             style={[
               styles.motionButton,

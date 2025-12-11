@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-export default function useThermostatStatus() {
+export default function useThermostatStatus(currentRoomId) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -12,11 +12,12 @@ export default function useThermostatStatus() {
   const [lastMotion, setLastMotion] = useState(null);
   const [lastTargetTemp, setLastTargetTemp] = useState(null);
 
-  const ESP_IP = "http://172.20.10.13";   //http://172.20.10.02
+  const ESP_IP = "http://172.20.10.02";   //http://172.20.10.02 or http://172.20.10.13
 
   //log history event
   const logHistoryEvent = (snapshot) => {
     const event = {
+      room: currentRoomId,
       type: snapshot.type,
       time: new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }),
       currentTemp: snapshot.currentTemp,
@@ -35,6 +36,8 @@ export default function useThermostatStatus() {
       try {
         const res = await fetch(`${ESP_IP}/status`);
         const json = await res.json();
+        console.log("STATUS JSON:", json);
+
         if (!mounted) return;
 
         setData(json);
@@ -84,7 +87,7 @@ export default function useThermostatStatus() {
     };
   }, [lastMotion, lastTargetTemp]);
 
-  //aet temp
+  //set temp
   const setTargetTempOnESP = useCallback(async (v) => {
     try {
       await fetch(`${ESP_IP}/set`, {
@@ -127,6 +130,9 @@ export default function useThermostatStatus() {
       console.warn("Failed to send motion toggle:", err);
     }
   }, []);
+
+  //room
+  
 
   return {
     data,
