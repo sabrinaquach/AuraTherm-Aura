@@ -32,11 +32,12 @@ Table of Contents
    - Event logs on app
      
 3. System Architecture
-4. Hardware Architecture
-5. Software Architecture
-6. How to Run the Project
-7. API Endpoints
-8. Known Limitations
+   <img width="684" height="564" alt="Screenshot 2025-12-10 at 6 21 31 PM" src="https://github.com/user-attachments/assets/c1064214-0f51-4647-a58f-b194723adb32" />
+5. Hardware Architecture
+6. Software Architecture
+7. How to Run the Project
+8. API Endpoints
+9. Known Limitations
    One of the main limitations of our project is that it doesnt not have per room control, motion detection and temperature sensing. This aspect of our project is part of our future works. However, the main features of the app such as temperature sensing, motion detection HVAC control, and app control works.
    Another limitation of the project is that we are only able to get the app to communicate with the ESP32 through a personal hotspot.
 10. Team Members
